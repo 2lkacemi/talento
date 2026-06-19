@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { clientsApi } from "@/lib/api";
 import { JobOffer } from "@/lib/types";
 import { X } from "lucide-react";
@@ -14,6 +15,8 @@ interface Props {
 }
 
 export default function JobOfferForm({ initial, defaultClientId, onSubmit, loading }: Props) {
+  const t = useTranslations("offers.form");
+  const tc = useTranslations("common");
   const { data: clients = [] } = useQuery({ queryKey: ["clients"], queryFn: clientsApi.getAll });
   const [skillInput, setSkillInput] = useState("");
   const [form, setForm] = useState({
@@ -34,10 +37,6 @@ export default function JobOfferForm({ initial, defaultClientId, onSubmit, loadi
     setSkillInput("");
   }
 
-  function removeSkill(skill: string) {
-    setForm({ ...form, requiredSkills: form.requiredSkills.filter((s) => s !== skill) });
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     await onSubmit(form);
@@ -46,25 +45,19 @@ export default function JobOfferForm({ initial, defaultClientId, onSubmit, loadi
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Title *</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700">{t("title")} *</label>
         <input
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
-          required
-          className="input"
-          placeholder="Senior React Developer"
+          required className="input"
+          placeholder={t("titlePlaceholder")}
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Client *</label>
-        <select
-          value={form.clientId}
-          onChange={(e) => setForm({ ...form, clientId: e.target.value })}
-          required
-          className="input"
-        >
-          <option value="">Select a client…</option>
+        <label className="mb-1 block text-sm font-medium text-gray-700">{t("client")} *</label>
+        <select value={form.clientId} onChange={(e) => setForm({ ...form, clientId: e.target.value })} required className="input">
+          <option value="">{t("selectClient")}</option>
           {clients.map((c) => (
             <option key={c.id} value={c.id}>{c.companyName} — {c.name}</option>
           ))}
@@ -72,55 +65,46 @@ export default function JobOfferForm({ initial, defaultClientId, onSubmit, loadi
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Description</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700">{t("description")}</label>
         <textarea
           value={form.description}
           onChange={(e) => setForm({ ...form, description: e.target.value })}
           className="input min-h-[100px] resize-y"
-          placeholder="Describe the role and responsibilities…"
+          placeholder={t("descriptionPlaceholder")}
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Location</label>
-          <input
-            value={form.location}
-            onChange={(e) => setForm({ ...form, location: e.target.value })}
-            className="input"
-            placeholder="Paris, France"
-          />
+          <label className="mb-1 block text-sm font-medium text-gray-700">{t("location")}</label>
+          <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="input" placeholder={t("locationPlaceholder")} />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Min. experience (years)</label>
-          <input
-            type="number"
-            min={0}
-            value={form.requiredExperienceYears}
-            onChange={(e) => setForm({ ...form, requiredExperienceYears: parseInt(e.target.value) || 0 })}
-            className="input"
-          />
+          <label className="mb-1 block text-sm font-medium text-gray-700">{t("experience")}</label>
+          <input type="number" min={0} value={form.requiredExperienceYears} onChange={(e) => setForm({ ...form, requiredExperienceYears: parseInt(e.target.value) || 0 })} className="input" />
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Required skills</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700">{t("skills")}</label>
         <div className="flex gap-2">
           <input
             value={skillInput}
             onChange={(e) => setSkillInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addSkill(); } }}
             className="input flex-1"
-            placeholder="React, Java, Python…"
+            placeholder={t("skillsPlaceholder")}
           />
-          <button type="button" onClick={addSkill} className="btn-secondary">Add</button>
+          <button type="button" onClick={addSkill} className="btn-secondary">{t("addSkill")}</button>
         </div>
         {form.requiredSkills.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-2">
             {form.requiredSkills.map((s) => (
               <span key={s} className="flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
                 {s}
-                <button type="button" onClick={() => removeSkill(s)}><X className="h-3 w-3" /></button>
+                <button type="button" onClick={() => setForm({ ...form, requiredSkills: form.requiredSkills.filter((x) => x !== s) })}>
+                  <X className="h-3 w-3" />
+                </button>
               </span>
             ))}
           </div>
@@ -128,16 +112,16 @@ export default function JobOfferForm({ initial, defaultClientId, onSubmit, loadi
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Status</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700">{t("status")}</label>
         <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as JobOffer["status"] })} className="input">
-          <option value="OPEN">Open</option>
-          <option value="CLOSED">Closed</option>
+          <option value="OPEN">{t("statusOpen")}</option>
+          <option value="CLOSED">{t("statusClosed")}</option>
         </select>
       </div>
 
       <div className="flex justify-end gap-3 pt-2">
         <button type="submit" disabled={loading} className="btn-primary">
-          {loading ? "Saving…" : "Save offer"}
+          {loading ? tc("saving") : t("save")}
         </button>
       </div>
     </form>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Client } from "@/lib/types";
 
 interface Props {
@@ -10,6 +11,8 @@ interface Props {
 }
 
 export default function ClientForm({ initial, onSubmit, loading }: Props) {
+  const t = useTranslations("clients.form");
+  const tc = useTranslations("common");
   const [form, setForm] = useState({
     name: initial?.name ?? "",
     companyName: initial?.companyName ?? "",
@@ -30,25 +33,25 @@ export default function ClientForm({ initial, onSubmit, loading }: Props) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Contact name *</label>
-          <input name="name" value={form.name} onChange={handleChange} required className="input" placeholder="Jane Smith" />
+          <label className="mb-1 block text-sm font-medium text-gray-700">{t("contactName")} *</label>
+          <input name="name" value={form.name} onChange={handleChange} required className="input" placeholder={t("contactPlaceholder")} />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Company *</label>
-          <input name="companyName" value={form.companyName} onChange={handleChange} required className="input" placeholder="Acme Corp" />
+          <label className="mb-1 block text-sm font-medium text-gray-700">{t("company")} *</label>
+          <input name="companyName" value={form.companyName} onChange={handleChange} required className="input" placeholder={t("companyPlaceholder")} />
         </div>
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Email *</label>
-        <input type="email" name="email" value={form.email} onChange={handleChange} required className="input" placeholder="jane@acme.com" />
+        <label className="mb-1 block text-sm font-medium text-gray-700">{t("email")} *</label>
+        <input type="email" name="email" value={form.email} onChange={handleChange} required className="input" placeholder={t("emailPlaceholder")} />
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Phone</label>
-        <input name="phone" value={form.phone} onChange={handleChange} className="input" placeholder="+1 555 000 0000" />
+        <label className="mb-1 block text-sm font-medium text-gray-700">{t("phone")}</label>
+        <input name="phone" value={form.phone} onChange={handleChange} className="input" placeholder={t("phonePlaceholder")} />
       </div>
       <div className="flex justify-end gap-3 pt-2">
         <button type="submit" disabled={loading} className="btn-primary">
-          {loading ? "Saving…" : "Save client"}
+          {loading ? tc("saving") : t("save")}
         </button>
       </div>
     </form>

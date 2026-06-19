@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { candidatesApi } from "@/lib/api";
 import AppShell from "@/components/layout/AppShell";
 import SkillTag from "@/components/ui/SkillTag";
@@ -18,6 +19,10 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function CandidateDetailPage({ params }: { params: { id: string } }) {
+  const t = useTranslations("candidates");
+  const tp = useTranslations("pipeline");
+  const tc = useTranslations("common");
+
   const { data: candidate, isLoading } = useQuery({
     queryKey: ["candidate", params.id],
     queryFn: () => candidatesApi.getById(params.id),
@@ -36,7 +41,7 @@ export default function CandidateDetailPage({ params }: { params: { id: string }
     <AppShell>
       <div className="mb-6">
         <Link href="/candidates" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors">
-          <ArrowLeft className="h-4 w-4" /> Back to candidates
+          <ArrowLeft className="h-4 w-4" /> {t("backTo")}
         </Link>
       </div>
 
@@ -47,7 +52,7 @@ export default function CandidateDetailPage({ params }: { params: { id: string }
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{candidate.fullName}</h1>
-            <p className="text-gray-500">{candidate.location} · {candidate.experienceYears} years experience</p>
+            <p className="text-gray-500">{candidate.location} · {tc("yearsExp", { n: candidate.experienceYears })}</p>
           </div>
         </div>
 
@@ -67,29 +72,27 @@ export default function CandidateDetailPage({ params }: { params: { id: string }
             </div>
           )}
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Clock className="h-4 w-4 text-gray-400 shrink-0" /> {candidate.experienceYears} years experience
+            <Clock className="h-4 w-4 text-gray-400 shrink-0" /> {tc("yearsExp", { n: candidate.experienceYears })}
           </div>
         </div>
 
         {candidate.cvUrl && (
           <a href={candidate.cvUrl} target="_blank" rel="noopener noreferrer"
             className="mt-4 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium">
-            <ExternalLink className="h-4 w-4" /> View CV
+            <ExternalLink className="h-4 w-4" /> {t("viewCv")}
           </a>
         )}
 
         {candidate.skills.length > 0 && (
           <div className="mt-6">
-            <p className="mb-2 text-sm font-medium text-gray-700">Skills</p>
-            <div className="flex flex-wrap gap-1.5">
-              {candidate.skills.map((s) => <SkillTag key={s} label={s} />)}
-            </div>
+            <p className="mb-2 text-sm font-medium text-gray-700">{t("form.skills")}</p>
+            <div className="flex flex-wrap gap-1.5">{candidate.skills.map((s) => <SkillTag key={s} label={s} />)}</div>
           </div>
         )}
 
         {candidate.languages.length > 0 && (
           <div className="mt-4">
-            <p className="mb-2 text-sm font-medium text-gray-700">Languages</p>
+            <p className="mb-2 text-sm font-medium text-gray-700">{t("form.languages")}</p>
             <div className="flex flex-wrap gap-1.5">
               {candidate.languages.map((l) => (
                 <span key={l} className="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700">{l}</span>
@@ -99,10 +102,10 @@ export default function CandidateDetailPage({ params }: { params: { id: string }
         )}
       </div>
 
-      <h2 className="mb-4 text-lg font-semibold text-gray-900">Application History</h2>
+      <h2 className="mb-4 text-lg font-semibold text-gray-900">{t("history")}</h2>
       <div className="card divide-y divide-gray-100">
         {applications.length === 0 && (
-          <p className="px-6 py-8 text-center text-sm text-gray-500">No applications yet.</p>
+          <p className="px-6 py-8 text-center text-sm text-gray-500">{t("noHistory")}</p>
         )}
         {applications.map((app) => (
           <Link key={app.id} href={`/offers/${app.jobOfferId}`} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors">
@@ -114,7 +117,7 @@ export default function CandidateDetailPage({ params }: { params: { id: string }
               </div>
             </div>
             <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLORS[app.status] || "bg-gray-100 text-gray-700"}`}>
-              {app.status.replace("_", " ")}
+              {tp(app.status as any)}
             </span>
           </Link>
         ))}

@@ -1,18 +1,20 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { clientsApi, jobOffersApi } from "@/lib/api";
 import AppShell from "@/components/layout/AppShell";
-import { ArrowLeft, Building2, Mail, Phone, Briefcase, Plus } from "lucide-react";
+import { ArrowLeft, Mail, Phone, Briefcase, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import JobOfferForm from "@/components/offers/JobOfferForm";
 import toast from "react-hot-toast";
-import { JobOffer } from "@/lib/types";
 
 export default function ClientDetailPage({ params }: { params: { id: string } }) {
   const qc = useQueryClient();
+  const t = useTranslations("clients");
+  const to = useTranslations("offers");
   const [showOfferModal, setShowOfferModal] = useState(false);
 
   const { data: client, isLoading } = useQuery({
@@ -27,8 +29,8 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
 
   const createOfferMutation = useMutation({
     mutationFn: jobOffersApi.create,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["client-offers", params.id] }); setShowOfferModal(false); toast.success("Job offer created"); },
-    onError: (e: any) => toast.error(e.response?.data?.message || "Failed to create offer"),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["client-offers", params.id] }); setShowOfferModal(false); toast.success(to("created")); },
+    onError: (e: any) => toast.error(e.response?.data?.message || to("created")),
   });
 
   if (isLoading) return <AppShell><div className="animate-pulse h-64 card bg-gray-100" /></AppShell>;
@@ -38,7 +40,7 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
     <AppShell>
       <div className="mb-6">
         <Link href="/clients" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors">
-          <ArrowLeft className="h-4 w-4" /> Back to clients
+          <ArrowLeft className="h-4 w-4" /> {t("backTo")}
         </Link>
       </div>
 
@@ -49,7 +51,7 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{client.companyName}</h1>
-            <p className="text-gray-500">Contact: {client.name}</p>
+            <p className="text-gray-500">{t("contactLabel", { name: client.name })}</p>
           </div>
         </div>
         <div className="mt-6 flex flex-wrap gap-6 text-sm">
@@ -62,21 +64,22 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
             </div>
           )}
           <div className="flex items-center gap-2 text-gray-600">
-            <Briefcase className="h-4 w-4 text-gray-400" /> {offers.length} job offer{offers.length !== 1 ? "s" : ""}
+            <Briefcase className="h-4 w-4 text-gray-400" />
+            {offers.length === 1 ? t("offerCount", { n: offers.length }) : t("offerCountPlural", { n: offers.length })}
           </div>
         </div>
       </div>
 
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">Job Offers</h2>
+        <h2 className="text-lg font-semibold text-gray-900">{to("title")}</h2>
         <button className="btn-primary" onClick={() => setShowOfferModal(true)}>
-          <Plus className="h-4 w-4" /> New offer
+          <Plus className="h-4 w-4" /> {to("newOffer")}
         </button>
       </div>
 
       <div className="card divide-y divide-gray-100">
         {offers.length === 0 && (
-          <p className="px-6 py-8 text-center text-sm text-gray-500">No job offers yet for this client.</p>
+          <p className="px-6 py-8 text-center text-sm text-gray-500">{t("noOffersYet")}</p>
         )}
         {offers.map((offer) => (
           <Link
@@ -86,17 +89,17 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
           >
             <div>
               <p className="font-medium text-gray-900">{offer.title}</p>
-              <p className="text-sm text-gray-500">{offer.location} · {offer.requiredExperienceYears}y exp</p>
+              <p className="text-sm text-gray-500">{offer.location}</p>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-500">{offer.applicationsCount} apps</span>
+              <span className="text-sm text-gray-500">{offer.applicationsCount}</span>
               <span className={offer.status === "OPEN" ? "badge-open" : "badge-closed"}>{offer.status}</span>
             </div>
           </Link>
         ))}
       </div>
 
-      <Modal open={showOfferModal} onClose={() => setShowOfferModal(false)} title="New job offer" size="lg">
+      <Modal open={showOfferModal} onClose={() => setShowOfferModal(false)} title={to("newOffer")} size="lg">
         <JobOfferForm
           defaultClientId={params.id}
           onSubmit={(data) => createOfferMutation.mutateAsync(data)}

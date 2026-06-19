@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { clientsApi } from "@/lib/api";
 import { Client } from "@/lib/types";
 import AppShell from "@/components/layout/AppShell";
@@ -15,6 +16,8 @@ import toast from "react-hot-toast";
 
 export default function ClientsPage() {
   const qc = useQueryClient();
+  const t = useTranslations("clients");
+  const tc = useTranslations("common");
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Client | null>(null);
 
@@ -25,24 +28,24 @@ export default function ClientsPage() {
 
   const createMutation = useMutation({
     mutationFn: clientsApi.create,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clients"] }); setShowModal(false); toast.success("Client created"); },
-    onError: (e: any) => toast.error(e.response?.data?.message || "Failed to create client"),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clients"] }); setShowModal(false); toast.success(t("created")); },
+    onError: (e: any) => toast.error(e.response?.data?.message || tc("failedCreate")),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => clientsApi.update(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clients"] }); setEditing(null); toast.success("Client updated"); },
-    onError: (e: any) => toast.error(e.response?.data?.message || "Failed to update client"),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clients"] }); setEditing(null); toast.success(t("updated")); },
+    onError: (e: any) => toast.error(e.response?.data?.message || tc("failedUpdate")),
   });
 
   const deleteMutation = useMutation({
     mutationFn: clientsApi.delete,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clients"] }); toast.success("Client deleted"); },
-    onError: () => toast.error("Failed to delete client"),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["clients"] }); toast.success(t("deleted")); },
+    onError: () => toast.error(tc("failedDelete")),
   });
 
   function handleDelete(client: Client) {
-    if (confirm(`Delete ${client.name} (${client.companyName})?`)) {
+    if (confirm(t("deleteConfirm", { name: client.name, company: client.companyName }))) {
       deleteMutation.mutate(client.id);
     }
   }
@@ -50,11 +53,11 @@ export default function ClientsPage() {
   return (
     <AppShell>
       <PageHeader
-        title="Clients"
-        subtitle={`${clients.length} client${clients.length !== 1 ? "s" : ""}`}
+        title={t("title")}
+        subtitle={`${clients.length}`}
         action={
           <button className="btn-primary" onClick={() => setShowModal(true)}>
-            <Plus className="h-4 w-4" /> New client
+            <Plus className="h-4 w-4" /> {t("newClient")}
           </button>
         }
       />
@@ -66,9 +69,9 @@ export default function ClientsPage() {
       ) : clients.length === 0 ? (
         <EmptyState
           icon={Building2}
-          title="No clients yet"
-          description="Add your first client to get started"
-          action={<button className="btn-primary" onClick={() => setShowModal(true)}><Plus className="h-4 w-4" /> New client</button>}
+          title={t("noClients")}
+          description={t("noClientsDesc")}
+          action={<button className="btn-primary" onClick={() => setShowModal(true)}><Plus className="h-4 w-4" /> {t("newClient")}</button>}
         />
       ) : (
         <div className="card divide-y divide-gray-100">
@@ -83,7 +86,11 @@ export default function ClientsPage() {
                   <p className="text-sm text-gray-500">{client.companyName} · {client.email}</p>
                 </div>
                 <div className="ml-auto flex items-center gap-4 text-sm text-gray-500">
-                  <span>{client.jobOffersCount} offer{client.jobOffersCount !== 1 ? "s" : ""}</span>
+                  <span>
+                    {client.jobOffersCount === 1
+                      ? t("offerCount", { n: client.jobOffersCount })
+                      : t("offerCountPlural", { n: client.jobOffersCount })}
+                  </span>
                   <ChevronRight className="h-4 w-4" />
                 </div>
               </Link>
@@ -100,11 +107,10 @@ export default function ClientsPage() {
         </div>
       )}
 
-      <Modal open={showModal} onClose={() => setShowModal(false)} title="New client">
+      <Modal open={showModal} onClose={() => setShowModal(false)} title={t("newClient")}>
         <ClientForm onSubmit={(data) => createMutation.mutateAsync(data)} loading={createMutation.isPending} />
       </Modal>
-
-      <Modal open={!!editing} onClose={() => setEditing(null)} title="Edit client">
+      <Modal open={!!editing} onClose={() => setEditing(null)} title={t("editClient")}>
         {editing && (
           <ClientForm
             initial={editing}

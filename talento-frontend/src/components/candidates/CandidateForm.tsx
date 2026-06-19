@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Candidate } from "@/lib/types";
 import { X } from "lucide-react";
 
@@ -11,6 +12,8 @@ interface Props {
 }
 
 export default function CandidateForm({ initial, onSubmit, loading }: Props) {
+  const t = useTranslations("candidates.form");
+  const tc = useTranslations("common");
   const [skillInput, setSkillInput] = useState("");
   const [langInput, setLangInput] = useState("");
   const [form, setForm] = useState({
@@ -43,48 +46,40 @@ export default function CandidateForm({ initial, onSubmit, loading }: Props) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">First name *</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">{t("firstName")} *</label>
           <input value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} required className="input" />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Last name *</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">{t("lastName")} *</label>
           <input value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} required className="input" />
         </div>
       </div>
-
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Email *</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">{t("email")} *</label>
           <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required className="input" />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Phone</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">{t("phone")}</label>
           <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="input" />
         </div>
       </div>
-
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Location</label>
-          <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="input" placeholder="Paris, France" />
+          <label className="mb-1 block text-sm font-medium text-gray-700">{t("location")}</label>
+          <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="input" placeholder={t("locationPlaceholder")} />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Experience (years)</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">{t("experience")}</label>
           <input type="number" min={0} value={form.experienceYears} onChange={(e) => setForm({ ...form, experienceYears: parseInt(e.target.value) || 0 })} className="input" />
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Skills</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700">{t("skills")}</label>
         <div className="flex gap-2">
-          <input
-            value={skillInput}
-            onChange={(e) => setSkillInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag("skills", skillInput); setSkillInput(""); } }}
-            className="input flex-1"
-            placeholder="React, Java…"
-          />
-          <button type="button" onClick={() => { addTag("skills", skillInput); setSkillInput(""); }} className="btn-secondary">Add</button>
+          <input value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag("skills", skillInput); setSkillInput(""); } }} className="input flex-1" placeholder={t("skillsPlaceholder")} />
+          <button type="button" onClick={() => { addTag("skills", skillInput); setSkillInput(""); }} className="btn-secondary">{t("addSkill")}</button>
         </div>
         <div className="mt-2 flex flex-wrap gap-1">
           {form.skills.map((s) => (
@@ -96,16 +91,10 @@ export default function CandidateForm({ initial, onSubmit, loading }: Props) {
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Languages</label>
+        <label className="mb-1 block text-sm font-medium text-gray-700">{t("languages")}</label>
         <div className="flex gap-2">
-          <input
-            value={langInput}
-            onChange={(e) => setLangInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag("languages", langInput); setLangInput(""); } }}
-            className="input flex-1"
-            placeholder="English, French…"
-          />
-          <button type="button" onClick={() => { addTag("languages", langInput); setLangInput(""); }} className="btn-secondary">Add</button>
+          <input value={langInput} onChange={(e) => setLangInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag("languages", langInput); setLangInput(""); } }} className="input flex-1" placeholder={t("languagesPlaceholder")} />
+          <button type="button" onClick={() => { addTag("languages", langInput); setLangInput(""); }} className="btn-secondary">{t("addSkill")}</button>
         </div>
         <div className="mt-2 flex flex-wrap gap-1">
           {form.languages.map((l) => (
@@ -117,13 +106,13 @@ export default function CandidateForm({ initial, onSubmit, loading }: Props) {
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">CV URL (optional)</label>
-        <input type="url" value={form.cvUrl} onChange={(e) => setForm({ ...form, cvUrl: e.target.value })} className="input" placeholder="https://…" />
+        <label className="mb-1 block text-sm font-medium text-gray-700">{t("cvUrl")}</label>
+        <input type="url" value={form.cvUrl} onChange={(e) => setForm({ ...form, cvUrl: e.target.value })} className="input" placeholder={t("cvPlaceholder")} />
       </div>
 
       <div className="flex justify-end gap-3 pt-2">
         <button type="submit" disabled={loading} className="btn-primary">
-          {loading ? "Saving…" : "Save candidate"}
+          {loading ? tc("saving") : t("save")}
         </button>
       </div>
     </form>

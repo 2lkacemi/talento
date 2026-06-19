@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { candidatesApi } from "@/lib/api";
 import { Candidate } from "@/lib/types";
 import AppShell from "@/components/layout/AppShell";
@@ -16,41 +17,43 @@ import toast from "react-hot-toast";
 
 export default function CandidatesPage() {
   const qc = useQueryClient();
+  const t = useTranslations("candidates");
+  const tc = useTranslations("common");
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Candidate | null>(null);
   const [search, setSearch] = useState("");
 
   const { data: candidates = [], isLoading } = useQuery({
     queryKey: ["candidates", search],
-    queryFn: () => search ? candidatesApi.search(search) : candidatesApi.getAll(),
+    queryFn: () => (search ? candidatesApi.search(search) : candidatesApi.getAll()),
   });
 
   const createMutation = useMutation({
     mutationFn: candidatesApi.create,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["candidates"] }); setShowModal(false); toast.success("Candidate created"); },
-    onError: (e: any) => toast.error(e.response?.data?.message || "Failed"),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["candidates"] }); setShowModal(false); toast.success(t("created")); },
+    onError: (e: any) => toast.error(e.response?.data?.message || tc("failedCreate")),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => candidatesApi.update(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["candidates"] }); setEditing(null); toast.success("Updated"); },
-    onError: (e: any) => toast.error(e.response?.data?.message || "Failed"),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["candidates"] }); setEditing(null); toast.success(t("updated")); },
+    onError: (e: any) => toast.error(e.response?.data?.message || tc("failedUpdate")),
   });
 
   const deleteMutation = useMutation({
     mutationFn: candidatesApi.delete,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["candidates"] }); toast.success("Deleted"); },
-    onError: () => toast.error("Failed"),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["candidates"] }); toast.success(t("deleted")); },
+    onError: () => toast.error(tc("failedDelete")),
   });
 
   return (
     <AppShell>
       <PageHeader
-        title="Candidates"
-        subtitle={`${candidates.length} candidate${candidates.length !== 1 ? "s" : ""}`}
+        title={t("title")}
+        subtitle={`${candidates.length}`}
         action={
           <button className="btn-primary" onClick={() => setShowModal(true)}>
-            <Plus className="h-4 w-4" /> New candidate
+            <Plus className="h-4 w-4" /> {t("newCandidate")}
           </button>
         }
       />
@@ -59,7 +62,7 @@ export default function CandidatesPage() {
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
         <input
           type="search"
-          placeholder="Search by name, email, location…"
+          placeholder={t("searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="input pl-10"
@@ -73,9 +76,9 @@ export default function CandidatesPage() {
       ) : candidates.length === 0 ? (
         <EmptyState
           icon={Users}
-          title="No candidates found"
-          description={search ? "Try a different search" : "Add your first candidate"}
-          action={!search ? <button className="btn-primary" onClick={() => setShowModal(true)}><Plus className="h-4 w-4" /> New candidate</button> : undefined}
+          title={t("noCandidates")}
+          description={search ? t("noResults") : t("noCandidatesDesc")}
+          action={!search ? <button className="btn-primary" onClick={() => setShowModal(true)}><Plus className="h-4 w-4" /> {t("newCandidate")}</button> : undefined}
         />
       ) : (
         <div className="card divide-y divide-gray-100">
@@ -90,7 +93,7 @@ export default function CandidatesPage() {
                   <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-500">
                     <span>{c.email}</span>
                     {c.location && <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{c.location}</span>}
-                    <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{c.experienceYears}y</span>
+                    <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{tc("expYears", { n: c.experienceYears })}</span>
                   </div>
                   {c.skills.length > 0 && (
                     <div className="mt-1.5 flex flex-wrap gap-1">
@@ -100,7 +103,7 @@ export default function CandidatesPage() {
                   )}
                 </div>
                 <div className="ml-auto flex items-center gap-3 shrink-0">
-                  <span className="text-sm text-gray-400">{c.applicationsCount} apps</span>
+                  <span className="text-sm text-gray-400">{c.applicationsCount} {t("apps")}</span>
                   <ChevronRight className="h-4 w-4 text-gray-400" />
                 </div>
               </Link>
@@ -108,7 +111,7 @@ export default function CandidatesPage() {
                 <button onClick={() => setEditing(c)} className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
                   <Pencil className="h-4 w-4" />
                 </button>
-                <button onClick={() => { if (confirm(`Delete ${c.fullName}?`)) deleteMutation.mutate(c.id); }} className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors">
+                <button onClick={() => { if (confirm(tc("deleteConfirm", { name: c.fullName }))) deleteMutation.mutate(c.id); }} className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
@@ -117,10 +120,10 @@ export default function CandidatesPage() {
         </div>
       )}
 
-      <Modal open={showModal} onClose={() => setShowModal(false)} title="New candidate" size="lg">
+      <Modal open={showModal} onClose={() => setShowModal(false)} title={t("newCandidate")} size="lg">
         <CandidateForm onSubmit={(d) => createMutation.mutateAsync(d)} loading={createMutation.isPending} />
       </Modal>
-      <Modal open={!!editing} onClose={() => setEditing(null)} title="Edit candidate" size="lg">
+      <Modal open={!!editing} onClose={() => setEditing(null)} title={t("editCandidate")} size="lg">
         {editing && (
           <CandidateForm
             initial={editing}

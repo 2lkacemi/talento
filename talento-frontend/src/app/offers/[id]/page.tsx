@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { jobOffersApi, applicationsApi, candidatesApi } from "@/lib/api";
+import { useTranslations } from "next-intl";
+import { jobOffersApi, applicationsApi } from "@/lib/api";
 import AppShell from "@/components/layout/AppShell";
 import KanbanBoard from "@/components/pipeline/KanbanBoard";
 import SkillTag from "@/components/ui/SkillTag";
@@ -16,8 +17,9 @@ type Tab = "pipeline" | "matched";
 
 export default function OfferDetailPage({ params }: { params: { id: string } }) {
   const qc = useQueryClient();
+  const t = useTranslations("offers");
+  const tc = useTranslations("common");
   const [tab, setTab] = useState<Tab>("pipeline");
-  const [applyingId, setApplyingId] = useState<string | null>(null);
 
   const { data: offer, isLoading } = useQuery({
     queryKey: ["job-offer", params.id],
@@ -35,10 +37,9 @@ export default function OfferDetailPage({ params }: { params: { id: string } }) 
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["ranked", params.id] });
       qc.invalidateQueries({ queryKey: ["applications", "job-offer", params.id] });
-      toast.success("Candidate added to pipeline");
-      setApplyingId(null);
+      toast.success(t("addToPipeline"));
     },
-    onError: (e: any) => toast.error(e.response?.data?.message || "Failed"),
+    onError: (e: any) => toast.error(e.response?.data?.message || tc("failedCreate")),
   });
 
   if (isLoading) return <AppShell><div className="card h-64 animate-pulse bg-gray-100" /></AppShell>;
@@ -48,7 +49,7 @@ export default function OfferDetailPage({ params }: { params: { id: string } }) 
     <AppShell>
       <div className="mb-6">
         <Link href="/offers" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors">
-          <ArrowLeft className="h-4 w-4" /> Back to offers
+          <ArrowLeft className="h-4 w-4" /> {t("backTo")}
         </Link>
       </div>
 
@@ -59,8 +60,8 @@ export default function OfferDetailPage({ params }: { params: { id: string } }) 
             <p className="text-gray-500">
               <Link href={`/clients/${offer.clientId}`} className="hover:text-blue-600 transition-colors">
                 {offer.clientCompanyName}
-              </Link>
-              {" "}· {offer.clientName}
+              </Link>{" "}
+              · {offer.clientName}
             </p>
           </div>
           <span className={offer.status === "OPEN" ? "badge-open" : "badge-closed"}>{offer.status}</span>
@@ -68,13 +69,11 @@ export default function OfferDetailPage({ params }: { params: { id: string } }) 
 
         <div className="flex flex-wrap gap-6 text-sm text-gray-600">
           {offer.location && <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-gray-400" />{offer.location}</span>}
-          <span className="flex items-center gap-1.5"><Clock className="h-4 w-4 text-gray-400" />{offer.requiredExperienceYears}+ years experience</span>
-          <span className="flex items-center gap-1.5"><Users className="h-4 w-4 text-gray-400" />{offer.applicationsCount} applications</span>
+          <span className="flex items-center gap-1.5"><Clock className="h-4 w-4 text-gray-400" />{tc("yearsExp", { n: offer.requiredExperienceYears })}</span>
+          <span className="flex items-center gap-1.5"><Users className="h-4 w-4 text-gray-400" />{offer.applicationsCount}</span>
         </div>
 
-        {offer.description && (
-          <p className="mt-4 text-sm text-gray-600 whitespace-pre-wrap">{offer.description}</p>
-        )}
+        {offer.description && <p className="mt-4 text-sm text-gray-600 whitespace-pre-wrap">{offer.description}</p>}
 
         {offer.requiredSkills.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">
@@ -83,28 +82,26 @@ export default function OfferDetailPage({ params }: { params: { id: string } }) 
         )}
 
         <div className="mt-4 pt-4 border-t border-gray-100">
-          <Link
-            href={`/apply/${offer.id}`}
-            target="_blank"
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-          >
-            Public application link →
+          <Link href={`/apply/${offer.id}`} target="_blank" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+            {t("publicLink")}
           </Link>
         </div>
       </div>
 
       <div className="mb-6 border-b border-gray-200">
         <nav className="flex gap-6">
-          {(["pipeline", "matched"] as Tab[]).map((t) => (
+          {(["pipeline", "matched"] as Tab[]).map((tab_) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
+              key={tab_}
+              onClick={() => setTab(tab_)}
               className={clsx(
-                "border-b-2 pb-3 text-sm font-medium capitalize transition-colors",
-                tab === t ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700"
+                "border-b-2 pb-3 text-sm font-medium transition-colors",
+                tab === tab_
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
               )}
             >
-              {t === "pipeline" ? "Kanban Pipeline" : "Matched Candidates"}
+              {tab_ === "pipeline" ? t("tabPipeline") : t("tabMatched")}
             </button>
           ))}
         </nav>
@@ -113,55 +110,50 @@ export default function OfferDetailPage({ params }: { params: { id: string } }) 
       {tab === "pipeline" && <KanbanBoard jobOfferId={params.id} />}
 
       {tab === "matched" && (
-        <div>
+        <div className="space-y-3">
           {rankedLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => <div key={i} className="card h-20 animate-pulse bg-gray-100" />)}
-            </div>
+            Array.from({ length: 5 }).map((_, i) => <div key={i} className="card h-20 animate-pulse bg-gray-100" />)
           ) : (
-            <div className="space-y-3">
-              {ranked.map(({ candidate, matchScore, alreadyApplied }) => (
-                <div key={candidate.id} className="card flex items-center justify-between p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700">
-                      {candidate.firstName[0]}{candidate.lastName[0]}
-                    </div>
-                    <div>
-                      <Link href={`/candidates/${candidate.id}`} className="font-medium text-gray-900 hover:text-blue-600 transition-colors">
-                        {candidate.fullName}
-                      </Link>
-                      <p className="text-sm text-gray-500">{candidate.location} · {candidate.experienceYears}y exp</p>
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {candidate.skills.slice(0, 4).map((s) => <SkillTag key={s} label={s} />)}
-                      </div>
-                    </div>
+            ranked.map(({ candidate, matchScore, alreadyApplied }) => (
+              <div key={candidate.id} className="card flex items-center justify-between p-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700">
+                    {candidate.firstName[0]}{candidate.lastName[0]}
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-center">
-                      <div className="flex items-center gap-1 text-amber-600 font-bold">
-                        <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                        {matchScore}
-                      </div>
-                      <p className="text-xs text-gray-400">match score</p>
+                  <div>
+                    <Link href={`/candidates/${candidate.id}`} className="font-medium text-gray-900 hover:text-blue-600 transition-colors">
+                      {candidate.fullName}
+                    </Link>
+                    <p className="text-sm text-gray-500">{candidate.location} · {tc("expYears", { n: candidate.experienceYears })}</p>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {candidate.skills.slice(0, 4).map((s) => <SkillTag key={s} label={s} />)}
                     </div>
-                    {alreadyApplied ? (
-                      <span className="flex items-center gap-1 text-sm text-green-600 font-medium">
-                        <CheckCircle className="h-4 w-4" /> In pipeline
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => applyMutation.mutate(candidate.id)}
-                        disabled={applyMutation.isPending && applyingId === candidate.id}
-                        className="btn-secondary text-xs"
-                        onMouseEnter={() => setApplyingId(candidate.id)}
-                      >
-                        <Plus className="h-3.5 w-3.5" /> Add to pipeline
-                      </button>
-                    )}
                   </div>
                 </div>
-              ))}
-            </div>
+                <div className="flex items-center gap-4">
+                  <div className="text-center">
+                    <div className="flex items-center gap-1 text-amber-600 font-bold">
+                      <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                      {matchScore}
+                    </div>
+                    <p className="text-xs text-gray-400">{t("matchScore")}</p>
+                  </div>
+                  {alreadyApplied ? (
+                    <span className="flex items-center gap-1 text-sm text-green-600 font-medium">
+                      <CheckCircle className="h-4 w-4" /> {t("inPipeline")}
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => applyMutation.mutate(candidate.id)}
+                      disabled={applyMutation.isPending}
+                      className="btn-secondary text-xs"
+                    >
+                      <Plus className="h-3.5 w-3.5" /> {t("addToPipeline")}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
           )}
         </div>
       )}
