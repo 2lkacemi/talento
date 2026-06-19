@@ -1,12 +1,3 @@
-import createMiddleware from "next-intl/middleware";
-
-export default createMiddleware({
-  locales: ["en", "fr"],
-  defaultLocale: "en",
-  localePrefix: "never",
-  localeDetection: true,
-});
-
-export const config = {
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
-};
+// next-intl middleware disabled — locale is read from NEXT_LOCALE cookie in layout.tsx
+// Keeping this file because next.config.mjs references next-intl/plugin
+export {};
