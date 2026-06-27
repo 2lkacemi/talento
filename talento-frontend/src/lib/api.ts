@@ -7,7 +7,10 @@ import {
   Client,
   DashboardStats,
   JobOffer,
+  PageResponse,
   RankedCandidate,
+  SearchResult,
+  StatusHistoryEntry,
 } from "./types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
@@ -52,7 +55,8 @@ export const dashboardApi = {
 
 // Clients
 export const clientsApi = {
-  getAll: () => api.get<Client[]>("/clients").then((r) => r.data),
+  getAll: (page = 0, size = 20) =>
+    api.get<PageResponse<Client>>(`/clients?page=${page}&size=${size}`).then((r) => r.data),
   getById: (id: string) => api.get<Client>(`/clients/${id}`).then((r) => r.data),
   create: (data: Omit<Client, "id" | "createdAt" | "jobOffersCount">) =>
     api.post<Client>("/clients", data).then((r) => r.data),
@@ -64,7 +68,11 @@ export const clientsApi = {
 
 // Job Offers
 export const jobOffersApi = {
-  getAll: () => api.get<JobOffer[]>("/job-offers").then((r) => r.data),
+  getAll: (page = 0, size = 20, status?: "OPEN" | "CLOSED") => {
+    const params = new URLSearchParams({ page: String(page), size: String(size) });
+    if (status) params.append("status", status);
+    return api.get<PageResponse<JobOffer>>(`/job-offers?${params}`).then((r) => r.data);
+  },
   getById: (id: string) => api.get<JobOffer>(`/job-offers/${id}`).then((r) => r.data),
   getPublic: (id: string) => api.get<JobOffer>(`/job-offers/${id}/public`).then((r) => r.data),
   create: (data: Partial<JobOffer>) => api.post<JobOffer>("/job-offers", data).then((r) => r.data),
@@ -77,9 +85,14 @@ export const jobOffersApi = {
 
 // Candidates
 export const candidatesApi = {
-  getAll: () => api.get<Candidate[]>("/candidates").then((r) => r.data),
+  getAll: (page = 0, size = 20, q?: string) => {
+    const params = new URLSearchParams({ page: String(page), size: String(size) });
+    if (q) params.append("q", q);
+    return api.get<PageResponse<Candidate>>(`/candidates?${params}`).then((r) => r.data);
+  },
   getById: (id: string) => api.get<Candidate>(`/candidates/${id}`).then((r) => r.data),
-  search: (q: string) => api.get<Candidate[]>(`/candidates/search?q=${encodeURIComponent(q)}`).then((r) => r.data),
+  search: (q: string) =>
+    api.get<Candidate[]>(`/candidates/search?q=${encodeURIComponent(q)}`).then((r) => r.data),
   create: (data: Partial<Candidate>) => api.post<Candidate>("/candidates", data).then((r) => r.data),
   update: (id: string, data: Partial<Candidate>) =>
     api.put<Candidate>(`/candidates/${id}`, data).then((r) => r.data),
@@ -94,6 +107,9 @@ export const applicationsApi = {
     api.get<Application[]>(`/applications/job-offer/${jobOfferId}`).then((r) => r.data),
   getByCandidate: (candidateId: string) =>
     api.get<Application[]>(`/applications/candidate/${candidateId}`).then((r) => r.data),
+  getById: (id: string) => api.get<Application>(`/applications/${id}`).then((r) => r.data),
+  getHistory: (id: string) =>
+    api.get<StatusHistoryEntry[]>(`/applications/${id}/history`).then((r) => r.data),
   create: (candidateId: string, jobOfferId: string, notes?: string) =>
     api.post<Application>("/applications", { candidateId, jobOfferId, notes }).then((r) => r.data),
   createPublic: (candidateId: string, jobOfferId: string) =>
@@ -101,6 +117,12 @@ export const applicationsApi = {
   updateStatus: (id: string, status: ApplicationStatus, notes?: string) =>
     api.patch<Application>(`/applications/${id}/status`, { status, notes }).then((r) => r.data),
   delete: (id: string) => api.delete(`/applications/${id}`),
+};
+
+// Global search
+export const searchApi = {
+  search: (q: string) =>
+    api.get<SearchResult>(`/search?q=${encodeURIComponent(q)}`).then((r) => r.data),
 };
 
 export default api;

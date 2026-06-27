@@ -39,9 +39,17 @@ public class JobOffer {
     @Column(name = "skill")
     private List<String> requiredSkills = new ArrayList<>();
 
+    @ElementCollection
+    @CollectionTable(name = "job_offer_languages", joinColumns = @JoinColumn(name = "job_offer_id"))
+    @Column(name = "language")
+    private List<String> requiredLanguages = new ArrayList<>();
+
     private int requiredExperienceYears;
 
     private String location;
+
+    @Column(nullable = false, columnDefinition = "integer default 1")
+    private int openPositions = 1;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

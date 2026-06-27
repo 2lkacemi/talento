@@ -6,6 +6,7 @@ import {
   DragOverlay,
   DragStartEvent,
   PointerSensor,
+  useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -19,6 +20,7 @@ import { applicationsApi } from "@/lib/api";
 import { Application, ApplicationStatus } from "@/lib/types";
 import { GripVertical, Star } from "lucide-react";
 import clsx from "clsx";
+import ApplicationDetailModal from "./ApplicationDetailModal";
 
 const COLUMN_IDS: ApplicationStatus[] = [
   "NEW", "CONTACTED", "INTERVIEW", "CLIENT_INTERVIEW", "OFFER", "HIRED", "REJECTED",
@@ -34,14 +36,35 @@ const COLUMN_COLORS: Record<ApplicationStatus, string> = {
   REJECTED: "bg-red-50 border-red-200",
 };
 
-function ApplicationCard({ application }: { application: Application }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: application.id });
+function ApplicationCard({
+  application,
+  onClick,
+}: {
+  application: Application;
+  onClick: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: application.id,
+  });
   const style = { transform: CSS.Transform.toString(transform), transition };
 
   return (
-    <div ref={setNodeRef} style={style} className="group rounded-lg border border-gray-200 bg-white p-3 shadow-sm hover:shadow-md transition-shadow">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={clsx(
+        "group rounded-lg border border-gray-200 bg-white p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer",
+        isDragging && "opacity-50"
+      )}
+      onClick={onClick}
+    >
       <div className="flex items-start gap-2">
-        <button {...attributes} {...listeners} className="mt-0.5 shrink-0 cursor-grab rounded p-0.5 text-gray-400 opacity-0 group-hover:opacity-100 active:cursor-grabbing">
+        <button
+          {...attributes}
+          {...listeners}
+          onClick={(e) => e.stopPropagation()}
+          className="mt-0.5 shrink-0 cursor-grab rounded p-0.5 text-gray-400 opacity-0 group-hover:opacity-100 active:cursor-grabbing"
+        >
           <GripVertical className="h-4 w-4" />
         </button>
         <div className="min-w-0 flex-1">
@@ -68,13 +91,20 @@ function KanbanColumn({
   status,
   label,
   applications,
+  onCardClick,
 }: {
   status: ApplicationStatus;
   label: string;
   applications: Application[];
+  onCardClick: (app: Application) => void;
 }) {
+  const { setNodeRef } = useDroppable({ id: status });
+
   return (
-    <div className={clsx("flex w-72 shrink-0 flex-col rounded-xl border-2 p-3", COLUMN_COLORS[status])}>
+    <div
+      ref={setNodeRef}
+      className={clsx("flex w-72 shrink-0 flex-col rounded-xl border-2 p-3", COLUMN_COLORS[status])}
+    >
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-700">{label}</h3>
         <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-gray-600 shadow-sm">
@@ -83,7 +113,9 @@ function KanbanColumn({
       </div>
       <SortableContext items={applications.map((a) => a.id)} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col gap-2 min-h-[4rem]">
-          {applications.map((app) => <ApplicationCard key={app.id} application={app} />)}
+          {applications.map((app) => (
+            <ApplicationCard key={app.id} application={app} onClick={() => onCardClick(app)} />
+          ))}
         </div>
       </SortableContext>
     </div>
@@ -94,6 +126,7 @@ export default function KanbanBoard({ jobOfferId }: { jobOfferId: string }) {
   const qc = useQueryClient();
   const t = useTranslations("pipeline");
   const [activeApp, setActiveApp] = useState<Application | null>(null);
+  const [selectedApp, setSelectedApp] = useState<Application | null>(null);
 
   const { data: applications = [], isLoading } = useQuery({
     queryKey: ["applications", "job-offer", jobOfferId],
@@ -103,8 +136,24 @@ export default function KanbanBoard({ jobOfferId }: { jobOfferId: string }) {
   const updateStatus = useMutation({
     mutationFn: ({ id, status }: { id: string; status: ApplicationStatus }) =>
       applicationsApi.updateStatus(id, status),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["applications", "job-offer", jobOfferId] }),
-    onError: () => toast.error(t("failedUpdate")),
+    onMutate: async ({ id, status }) => {
+      await qc.cancelQueries({ queryKey: ["applications", "job-offer", jobOfferId] });
+      const previous = qc.getQueryData<Application[]>(["applications", "job-offer", jobOfferId]);
+      qc.setQueryData<Application[]>(
+        ["applications", "job-offer", jobOfferId],
+        (old) => old?.map((a) => (a.id === id ? { ...a, status } : a)) ?? []
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) {
+        qc.setQueryData(["applications", "job-offer", jobOfferId], ctx.previous);
+      }
+      toast.error(t("failedUpdate"));
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ["applications", "job-offer", jobOfferId] });
+    },
   });
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
@@ -119,9 +168,11 @@ export default function KanbanBoard({ jobOfferId }: { jobOfferId: string }) {
     if (!over) return;
     const draggedApp = applications.find((a) => a.id === active.id);
     if (!draggedApp) return;
-    const targetStatus = (COLUMN_IDS.includes(over.id as ApplicationStatus)
-      ? over.id
-      : applications.find((a) => a.id === over.id)?.status) as ApplicationStatus | undefined;
+    const targetStatus = (
+      COLUMN_IDS.includes(over.id as ApplicationStatus)
+        ? over.id
+        : applications.find((a) => a.id === over.id)?.status
+    ) as ApplicationStatus | undefined;
     if (targetStatus && targetStatus !== draggedApp.status) {
       updateStatus.mutate({ id: draggedApp.id, status: targetStatus });
     }
@@ -135,26 +186,47 @@ export default function KanbanBoard({ jobOfferId }: { jobOfferId: string }) {
     );
   }
 
-  const grouped = Object.fromEntries(COLUMN_IDS.map((s) => [s, [] as Application[]])) as Record<ApplicationStatus, Application[]>;
+  const grouped = Object.fromEntries(
+    COLUMN_IDS.map((s) => [s, [] as Application[]])
+  ) as Record<ApplicationStatus, Application[]>;
   for (const app of applications) {
     if (grouped[app.status]) grouped[app.status].push(app);
   }
 
+  // Keep selectedApp in sync with the latest data (notes may have changed)
+  const selectedAppLive = selectedApp
+    ? (applications.find((a) => a.id === selectedApp.id) ?? selectedApp)
+    : null;
+
   return (
-    <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-      <div className="flex gap-4 overflow-x-auto pb-4">
-        {COLUMN_IDS.map((status) => (
-          <KanbanColumn key={status} status={status} label={t(status)} applications={grouped[status]} />
-        ))}
-      </div>
-      <DragOverlay>
-        {activeApp && (
-          <div className="rotate-2 rounded-lg border border-gray-200 bg-white p-3 shadow-xl opacity-90">
-            <p className="text-sm font-semibold text-gray-900">{activeApp.candidateName}</p>
-            <p className="text-xs text-gray-500">{activeApp.candidateEmail}</p>
-          </div>
-        )}
-      </DragOverlay>
-    </DndContext>
+    <>
+      <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <div className="flex gap-4 overflow-x-auto pb-4">
+          {COLUMN_IDS.map((status) => (
+            <KanbanColumn
+              key={status}
+              status={status}
+              label={t(status)}
+              applications={grouped[status]}
+              onCardClick={setSelectedApp}
+            />
+          ))}
+        </div>
+        <DragOverlay>
+          {activeApp && (
+            <div className="rotate-2 rounded-lg border border-gray-200 bg-white p-3 shadow-xl opacity-90">
+              <p className="text-sm font-semibold text-gray-900">{activeApp.candidateName}</p>
+              <p className="text-xs text-gray-500">{activeApp.candidateEmail}</p>
+            </div>
+          )}
+        </DragOverlay>
+      </DndContext>
+
+      <ApplicationDetailModal
+        application={selectedAppLive}
+        jobOfferId={jobOfferId}
+        onClose={() => setSelectedApp(null)}
+      />
+    </>
   );
 }

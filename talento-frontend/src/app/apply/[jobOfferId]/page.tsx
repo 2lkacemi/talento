@@ -7,6 +7,7 @@ import { jobOffersApi } from "@/lib/api";
 import api from "@/lib/api";
 import { X, CheckCircle, MapPin, Clock, Briefcase } from "lucide-react";
 import SkillTag from "@/components/ui/SkillTag";
+import CvUpload from "@/components/ui/CvUpload";
 import toast from "react-hot-toast";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 
@@ -179,8 +180,18 @@ export default function ApplyPage({ params }: { params: { jobOfferId: string } }
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">{t("form.cvUrl")}</label>
-              <input type="url" value={form.cvUrl} onChange={(e) => setForm({ ...form, cvUrl: e.target.value })} className="input" placeholder={t("form.cvPlaceholder")} />
+              <label className="mb-1 block text-sm font-medium text-gray-700">{t("form.cvUpload")}</label>
+              <CvUpload
+                value={form.cvUrl}
+                onChange={(url) => setForm({ ...form, cvUrl: url })}
+                labels={{
+                  upload: t("form.cvUploadBtn"),
+                  uploading: t("form.cvUploading"),
+                  replace: t("form.cvReplace"),
+                  view: t("form.cvView"),
+                  uploadError: t("form.cvUploadError"),
+                }}
+              />
             </div>
 
             <button type="submit" disabled={loading || offer.status === "CLOSED"} className="btn-primary w-full justify-center">

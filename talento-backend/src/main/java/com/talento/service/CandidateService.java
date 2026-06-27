@@ -2,11 +2,13 @@ package com.talento.service;
 
 import com.talento.dto.request.CandidateRequest;
 import com.talento.dto.response.CandidateResponse;
+import com.talento.dto.response.PageResponse;
 import com.talento.exception.DuplicateResourceException;
 import com.talento.exception.ResourceNotFoundException;
 import com.talento.model.Candidate;
 import com.talento.repository.CandidateRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -30,6 +32,11 @@ public class CandidateService {
     }
 
     @Transactional(readOnly = true)
+    public PageResponse<CandidateResponse> findAll(Pageable pageable) {
+        return PageResponse.from(candidateRepository.findAll(pageable), CandidateResponse::from);
+    }
+
+    @Transactional(readOnly = true)
     public CandidateResponse findById(UUID id) {
         return CandidateResponse.from(getCandidateOrThrow(id));
     }
@@ -47,6 +54,14 @@ public class CandidateService {
         return candidateRepository.search(query).stream()
             .map(CandidateResponse::from)
             .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<CandidateResponse> search(String query, Pageable pageable) {
+        if (!StringUtils.hasText(query)) {
+            return findAll(pageable);
+        }
+        return PageResponse.from(candidateRepository.searchPage(query, pageable), CandidateResponse::from);
     }
 
     @Transactional

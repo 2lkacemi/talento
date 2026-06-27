@@ -5,12 +5,12 @@ export default getRequestConfig(async () => {
   // cookies() is synchronous in Next.js 14
   const cookieStore = cookies();
   const raw = cookieStore.get("NEXT_LOCALE")?.value;
-  const locale = raw === "fr" ? "fr" : "en";
+  const locale = raw === "en" ? "en" : "fr";
 
   const messages =
-    locale === "fr"
-      ? (await import("../../messages/fr.json")).default
-      : (await import("../../messages/en.json")).default;
+    locale === "en"
+      ? (await import("../../messages/en.json")).default
+      : (await import("../../messages/fr.json")).default;
 
   return { locale, messages };
 });

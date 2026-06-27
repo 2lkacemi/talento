@@ -3,6 +3,7 @@ package com.talento.controller;
 import com.talento.dto.request.ApplicationRequest;
 import com.talento.dto.request.ApplicationStatusRequest;
 import com.talento.dto.response.ApplicationResponse;
+import com.talento.dto.response.ApplicationStatusHistoryResponse;
 import com.talento.service.ApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,11 @@ public class ApplicationController {
     @GetMapping("/{id}")
     public ResponseEntity<ApplicationResponse> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(applicationService.findById(id));
+    }
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<List<ApplicationStatusHistoryResponse>> getHistory(@PathVariable UUID id) {
+        return ResponseEntity.ok(applicationService.getHistory(id));
     }
 
     @PostMapping

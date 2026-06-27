@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Candidate } from "@/lib/types";
 import { X } from "lucide-react";
+import CvUpload from "@/components/ui/CvUpload";
 
 interface Props {
   initial?: Partial<Candidate>;
@@ -106,8 +107,18 @@ export default function CandidateForm({ initial, onSubmit, loading }: Props) {
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">{t("cvUrl")}</label>
-        <input type="url" value={form.cvUrl} onChange={(e) => setForm({ ...form, cvUrl: e.target.value })} className="input" placeholder={t("cvPlaceholder")} />
+        <label className="mb-1 block text-sm font-medium text-gray-700">{t("cvUpload")}</label>
+        <CvUpload
+          value={form.cvUrl ?? ""}
+          onChange={(url) => setForm({ ...form, cvUrl: url })}
+          labels={{
+            upload: t("cvUploadBtn"),
+            uploading: t("cvUploading"),
+            replace: t("cvReplace"),
+            view: t("cvView"),
+            uploadError: t("cvUploadError"),
+          }}
+        />
       </div>
 
       <div className="flex justify-end gap-3 pt-2">

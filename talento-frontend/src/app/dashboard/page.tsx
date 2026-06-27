@@ -14,15 +14,16 @@ export default function DashboardPage() {
     queryKey: ["dashboard-stats"],
     queryFn: dashboardApi.getStats,
   });
-  const { data: offers = [] } = useQuery({
-    queryKey: ["job-offers"],
-    queryFn: jobOffersApi.getAll,
+  const { data: offersPage } = useQuery({
+    queryKey: ["job-offers-recent"],
+    queryFn: () => jobOffersApi.getAll(0, 5),
   });
+  const offers = offersPage?.content ?? [];
 
   return (
     <AppShell>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+      <div className="mb-6">
+        <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">{t("title")}</h1>
         <p className="mt-1 text-sm text-gray-500">{t("subtitle")}</p>
       </div>
 
@@ -54,18 +55,18 @@ export default function DashboardPage() {
           {offers.length === 0 && (
             <p className="px-6 py-8 text-center text-sm text-gray-500">{t("noOffers")}</p>
           )}
-          {offers.slice(0, 5).map((offer) => (
+          {offers.map((offer) => (
             <Link
               key={offer.id}
               href={`/offers/${offer.id}`}
-              className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
+              className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-gray-50 transition-colors sm:px-6 sm:py-4"
             >
-              <div>
-                <p className="font-medium text-gray-900">{offer.title}</p>
-                <p className="text-sm text-gray-500">{offer.clientCompanyName}</p>
+              <div className="min-w-0">
+                <p className="truncate font-medium text-gray-900">{offer.title}</p>
+                <p className="truncate text-sm text-gray-500">{offer.clientCompanyName}</p>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-500">{offer.applicationsCount} {t("apps")}</span>
+              <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                <span className="hidden text-sm text-gray-500 sm:inline">{offer.applicationsCount} {t("apps")}</span>
                 <span className={offer.status === "OPEN" ? "badge-open" : "badge-closed"}>
                   {offer.status}
                 </span>

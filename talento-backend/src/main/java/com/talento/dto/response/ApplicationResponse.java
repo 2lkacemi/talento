@@ -4,6 +4,7 @@ import com.talento.model.Application;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -20,6 +21,7 @@ public class ApplicationResponse {
     private String notes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private List<ApplicationStatusHistoryResponse> statusHistory;
 
     public static ApplicationResponse from(Application application) {
         ApplicationResponse r = new ApplicationResponse();

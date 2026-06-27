@@ -16,11 +16,14 @@ export interface JobOffer {
   clientName: string;
   clientCompanyName: string;
   requiredSkills: string[];
+  requiredLanguages: string[];
   requiredExperienceYears: number;
   location: string;
+  openPositions: number;
   status: "OPEN" | "CLOSED";
   createdAt: string;
   applicationsCount: number;
+  hiredCount: number;
 }
 
 export interface Candidate {
@@ -48,6 +51,14 @@ export type ApplicationStatus =
   | "HIRED"
   | "REJECTED";
 
+export interface StatusHistoryEntry {
+  id: string;
+  fromStatus: ApplicationStatus | null;
+  toStatus: ApplicationStatus;
+  notes: string | null;
+  changedAt: string;
+}
+
 export interface Application {
   id: string;
   candidateId: string;
@@ -61,6 +72,7 @@ export interface Application {
   notes: string;
   createdAt: string;
   updatedAt: string;
+  statusHistory?: StatusHistoryEntry[];
 }
 
 export interface RankedCandidate {
@@ -83,4 +95,19 @@ export interface AuthResponse {
   email: string;
   fullName: string;
   role: string;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+}
+
+export interface SearchResult {
+  candidates: Candidate[];
+  clients: Client[];
+  jobOffers: JobOffer[];
 }

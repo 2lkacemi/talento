@@ -69,9 +69,16 @@ public class MatchingService {
             score += 2;
         }
 
-        // +1 per matching language
-        if (candidate.getLanguages() != null) {
-            score += candidate.getLanguages().size();
+        // +2 per required language the candidate speaks
+        if (offer.getRequiredLanguages() != null && candidate.getLanguages() != null) {
+            Set<String> candidateLangs = candidate.getLanguages().stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+            for (String required : offer.getRequiredLanguages()) {
+                if (candidateLangs.contains(required.toLowerCase())) {
+                    score += 2;
+                }
+            }
         }
 
         return score;

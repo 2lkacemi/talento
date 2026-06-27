@@ -2,11 +2,13 @@ package com.talento.service;
 
 import com.talento.dto.request.ClientRequest;
 import com.talento.dto.response.ClientResponse;
+import com.talento.dto.response.PageResponse;
 import com.talento.exception.DuplicateResourceException;
 import com.talento.exception.ResourceNotFoundException;
 import com.talento.model.Client;
 import com.talento.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,11 @@ public class ClientService {
         return clientRepository.findAll().stream()
             .map(ClientResponse::from)
             .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<ClientResponse> findAll(Pageable pageable) {
+        return PageResponse.from(clientRepository.findAll(pageable), ClientResponse::from);
     }
 
     @Transactional(readOnly = true)

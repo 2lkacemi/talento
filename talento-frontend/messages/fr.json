@@ -42,6 +42,14 @@
     "noClients": "Aucun client pour l'instant",
     "noClientsDesc": "Ajoutez votre premier client pour commencer",
     "deleteConfirm": "Supprimer {name} ({company}) ?",
+    "searchPlaceholder": "Rechercher par entreprise, contact, e-mail…",
+    "noResults": "Aucun résultat",
+    "colCompany": "Entreprise",
+    "colContact": "Contact",
+    "colEmail": "E-mail",
+    "colPhone": "Téléphone",
+    "colOffers": "Offres",
+    "colAddedAt": "Ajouté le",
     "created": "Client créé",
     "updated": "Client mis à jour",
     "deleted": "Client supprimé",
@@ -82,6 +90,15 @@
     "updated": "Mise à jour",
     "deleted": "Supprimée",
     "backTo": "Retour aux offres",
+    "closeOffer": "Fermer l'offre",
+    "reopenOffer": "Rouvrir l'offre",
+    "searchCandidates": "Rechercher un candidat…",
+    "noMatches": "Aucun candidat correspondant.",
+    "colCandidate": "Candidat",
+    "colLocation": "Localisation",
+    "colExperience": "Expérience",
+    "colSkills": "Compétences",
+    "colScore": "Score",
     "form": {
       "title": "Titre",
       "titlePlaceholder": "Développeur React Senior",
@@ -95,11 +112,16 @@
       "skills": "Compétences requises",
       "skillsPlaceholder": "React, Java, Python…",
       "addSkill": "Ajouter",
+      "languages": "Langues requises",
+      "languagesPlaceholder": "Anglais, Français…",
       "status": "Statut",
       "statusOpen": "Ouverte",
       "statusClosed": "Fermée",
+      "openPositions": "Nombre de postes à pourvoir",
       "save": "Enregistrer l'offre"
-    }
+    },
+    "hiringProgress": "Progression du recrutement",
+    "positions": "postes"
   },
   "candidates": {
     "title": "Candidats",
@@ -114,6 +136,18 @@
     "noHistory": "Aucune candidature pour l'instant.",
     "backTo": "Retour aux candidats",
     "viewCv": "Voir le CV",
+    "columns": "Colonnes",
+    "filterPlaceholder": "Filtrer…",
+    "colName": "Nom",
+    "colEmail": "E-mail",
+    "colPhone": "Téléphone",
+    "colLocation": "Localisation",
+    "colExperience": "Expérience",
+    "colSkills": "Compétences",
+    "colLanguages": "Langues",
+    "colApplications": "Candidatures",
+    "colAddedAt": "Ajouté le",
+    "colActions": "Actions",
     "created": "Candidat créé",
     "updated": "Mis à jour",
     "deleted": "Supprimé",
@@ -132,6 +166,12 @@
       "cvUrl": "Lien CV (optionnel)",
       "cvPlaceholder": "https://…",
       "addSkill": "Ajouter",
+      "cvUpload": "CV",
+      "cvUploadBtn": "Importer un CV (PDF, DOC, DOCX)",
+      "cvUploading": "Importation…",
+      "cvReplace": "Remplacer",
+      "cvView": "Voir",
+      "cvUploadError": "Échec de l'import. Vérifiez le format.",
       "save": "Enregistrer le candidat"
     }
   },
@@ -143,7 +183,21 @@
     "OFFER": "Offre",
     "HIRED": "Recruté",
     "REJECTED": "Refusé",
-    "failedUpdate": "Échec de la mise à jour du statut"
+    "failedUpdate": "Échec de la mise à jour du statut",
+    "notes": "Notes",
+    "notesPlaceholder": "Ajouter des notes sur ce candidat…",
+    "notesSaved": "Notes enregistrées",
+    "saveNotes": "Enregistrer",
+    "saving": "Enregistrement…",
+    "viewCandidate": "Voir le profil du candidat",
+    "statusHistory": "Historique des statuts"
+  },
+  "search": {
+    "placeholder": "Rechercher candidats, clients, offres…",
+    "noResults": "Aucun résultat trouvé",
+    "candidates": "Candidats",
+    "clients": "Clients",
+    "jobOffers": "Offres d'emploi"
   },
   "apply": {
     "notAvailable": "Cette offre d'emploi n'est plus disponible.",
@@ -166,8 +220,12 @@
       "skillsPlaceholder": "Tapez une compétence et appuyez sur Entrée",
       "languages": "Langues",
       "languagesPlaceholder": "Anglais, Français…",
-      "cvUrl": "Lien CV (optionnel)",
-      "cvPlaceholder": "https://linkedin.com/in/…",
+      "cvUpload": "CV",
+      "cvUploadBtn": "Importer un CV (PDF, DOC, DOCX)",
+      "cvUploading": "Importation…",
+      "cvReplace": "Remplacer",
+      "cvView": "Voir",
+      "cvUploadError": "Échec de l'import. Vérifiez le format.",
       "add": "Ajouter"
     }
   },
@@ -183,6 +241,13 @@
     "failedDelete": "Échec de la suppression",
     "failedCreate": "Échec de la création",
     "failedUpdate": "Échec de la mise à jour",
-    "language": "Langue"
+    "clearFilters": "Effacer les filtres",
+    "columns": "Colonnes",
+    "filterPlaceholder": "Filtrer…",
+    "actions": "Actions",
+    "language": "Langue",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "pageOf": "Page {current} sur {total}"
   }
 }

@@ -27,10 +27,17 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
     queryFn: () => clientsApi.getJobOffers(params.id),
   });
 
+  const tc = useTranslations("common");
+
   const createOfferMutation = useMutation({
     mutationFn: jobOffersApi.create,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["client-offers", params.id] }); setShowOfferModal(false); toast.success(to("created")); },
-    onError: (e: any) => toast.error(e.response?.data?.message || to("created")),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["client-offers", params.id] });
+      qc.invalidateQueries({ queryKey: ["job-offers"] });
+      setShowOfferModal(false);
+      toast.success(to("created"));
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || tc("failedCreate")),
   });
 
   if (isLoading) return <AppShell><div className="animate-pulse h-64 card bg-gray-100" /></AppShell>;

@@ -21,9 +21,13 @@ public class JobOfferRequest {
 
     private List<String> requiredSkills;
 
+    private List<String> requiredLanguages;
+
     private int requiredExperienceYears;
 
     private String location;
+
+    private int openPositions = 1;
 
     private JobOffer.JobOfferStatus status = JobOffer.JobOfferStatus.OPEN;
 }

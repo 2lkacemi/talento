@@ -2,11 +2,16 @@ package com.talento.controller;
 
 import com.talento.dto.request.JobOfferRequest;
 import com.talento.dto.response.JobOfferResponse;
+import com.talento.dto.response.PageResponse;
 import com.talento.dto.response.RankedCandidateResponse;
+import com.talento.model.JobOffer;
 import com.talento.service.ApplicationService;
 import com.talento.service.JobOfferService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +28,10 @@ public class JobOfferController {
     private final ApplicationService applicationService;
 
     @GetMapping
-    public ResponseEntity<List<JobOfferResponse>> getAll() {
-        return ResponseEntity.ok(jobOfferService.findAll());
+    public ResponseEntity<PageResponse<JobOfferResponse>> getAll(
+            @RequestParam(required = false) JobOffer.JobOfferStatus status,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(jobOfferService.findAll(pageable, status));
     }
 
     @GetMapping("/{id}")

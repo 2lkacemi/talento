@@ -3,13 +3,16 @@ package com.talento.service;
 import com.talento.dto.request.ApplicationRequest;
 import com.talento.dto.request.ApplicationStatusRequest;
 import com.talento.dto.response.ApplicationResponse;
+import com.talento.dto.response.ApplicationStatusHistoryResponse;
 import com.talento.dto.response.RankedCandidateResponse;
 import com.talento.exception.DuplicateResourceException;
 import com.talento.exception.ResourceNotFoundException;
 import com.talento.model.Application;
+import com.talento.model.ApplicationStatusHistory;
 import com.talento.model.Candidate;
 import com.talento.model.JobOffer;
 import com.talento.repository.ApplicationRepository;
+import com.talento.repository.ApplicationStatusHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +26,7 @@ import java.util.stream.Collectors;
 public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
+    private final ApplicationStatusHistoryRepository statusHistoryRepository;
     private final CandidateService candidateService;
     private final JobOfferService jobOfferService;
     private final MatchingService matchingService;
@@ -43,7 +47,22 @@ public class ApplicationService {
 
     @Transactional(readOnly = true)
     public ApplicationResponse findById(UUID id) {
-        return ApplicationResponse.from(getApplicationOrThrow(id));
+        Application application = getApplicationOrThrow(id);
+        ApplicationResponse response = ApplicationResponse.from(application);
+        response.setStatusHistory(
+            statusHistoryRepository.findByApplicationIdOrderByChangedAtAsc(id).stream()
+                .map(ApplicationStatusHistoryResponse::from)
+                .collect(Collectors.toList())
+        );
+        return response;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ApplicationStatusHistoryResponse> getHistory(UUID applicationId) {
+        getApplicationOrThrow(applicationId);
+        return statusHistoryRepository.findByApplicationIdOrderByChangedAtAsc(applicationId).stream()
+            .map(ApplicationStatusHistoryResponse::from)
+            .collect(Collectors.toList());
     }
 
     @Transactional
@@ -70,11 +89,22 @@ public class ApplicationService {
     @Transactional
     public ApplicationResponse updateStatus(UUID id, ApplicationStatusRequest request) {
         Application application = getApplicationOrThrow(id);
+        Application.ApplicationStatus oldStatus = application.getStatus();
+
         application.setStatus(request.getStatus());
         if (request.getNotes() != null) {
             application.setNotes(request.getNotes());
         }
-        return ApplicationResponse.from(applicationRepository.save(application));
+        applicationRepository.save(application);
+
+        ApplicationStatusHistory history = new ApplicationStatusHistory();
+        history.setApplication(application);
+        history.setFromStatus(oldStatus);
+        history.setToStatus(request.getStatus());
+        history.setNotes(request.getNotes());
+        statusHistoryRepository.save(history);
+
+        return ApplicationResponse.from(application);
     }
 
     @Transactional

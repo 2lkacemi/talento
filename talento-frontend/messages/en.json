@@ -42,6 +42,14 @@
     "noClients": "No clients yet",
     "noClientsDesc": "Add your first client to get started",
     "deleteConfirm": "Delete {name} ({company})?",
+    "searchPlaceholder": "Search by company, contact, email…",
+    "noResults": "No results",
+    "colCompany": "Company",
+    "colContact": "Contact",
+    "colEmail": "Email",
+    "colPhone": "Phone",
+    "colOffers": "Offers",
+    "colAddedAt": "Added on",
     "created": "Client created",
     "updated": "Client updated",
     "deleted": "Client deleted",
@@ -82,6 +90,15 @@
     "updated": "Updated",
     "deleted": "Deleted",
     "backTo": "Back to offers",
+    "closeOffer": "Close offer",
+    "reopenOffer": "Reopen offer",
+    "searchCandidates": "Search candidate…",
+    "noMatches": "No matching candidates.",
+    "colCandidate": "Candidate",
+    "colLocation": "Location",
+    "colExperience": "Experience",
+    "colSkills": "Skills",
+    "colScore": "Score",
     "form": {
       "title": "Title",
       "titlePlaceholder": "Senior React Developer",
@@ -95,11 +112,16 @@
       "skills": "Required skills",
       "skillsPlaceholder": "React, Java, Python…",
       "addSkill": "Add",
+      "languages": "Required languages",
+      "languagesPlaceholder": "English, French…",
       "status": "Status",
       "statusOpen": "Open",
       "statusClosed": "Closed",
+      "openPositions": "Number of open positions",
       "save": "Save offer"
-    }
+    },
+    "hiringProgress": "Hiring progress",
+    "positions": "positions"
   },
   "candidates": {
     "title": "Candidates",
@@ -114,6 +136,18 @@
     "noHistory": "No applications yet.",
     "backTo": "Back to candidates",
     "viewCv": "View CV",
+    "columns": "Columns",
+    "filterPlaceholder": "Filter…",
+    "colName": "Name",
+    "colEmail": "Email",
+    "colPhone": "Phone",
+    "colLocation": "Location",
+    "colExperience": "Experience",
+    "colSkills": "Skills",
+    "colLanguages": "Languages",
+    "colApplications": "Applications",
+    "colAddedAt": "Added on",
+    "colActions": "Actions",
     "created": "Candidate created",
     "updated": "Updated",
     "deleted": "Deleted",
@@ -132,6 +166,12 @@
       "cvUrl": "CV URL (optional)",
       "cvPlaceholder": "https://…",
       "addSkill": "Add",
+      "cvUpload": "CV",
+      "cvUploadBtn": "Upload CV (PDF, DOC, DOCX)",
+      "cvUploading": "Uploading…",
+      "cvReplace": "Replace",
+      "cvView": "View",
+      "cvUploadError": "Upload failed. Check the file format.",
       "save": "Save candidate"
     }
   },
@@ -143,7 +183,21 @@
     "OFFER": "Offer",
     "HIRED": "Hired",
     "REJECTED": "Rejected",
-    "failedUpdate": "Failed to update status"
+    "failedUpdate": "Failed to update status",
+    "notes": "Notes",
+    "notesPlaceholder": "Add notes about this candidate…",
+    "notesSaved": "Notes saved",
+    "saveNotes": "Save notes",
+    "saving": "Saving…",
+    "viewCandidate": "View candidate profile",
+    "statusHistory": "Status history"
+  },
+  "search": {
+    "placeholder": "Search candidates, clients, offers…",
+    "noResults": "No results found",
+    "candidates": "Candidates",
+    "clients": "Clients",
+    "jobOffers": "Job Offers"
   },
   "apply": {
     "notAvailable": "This job offer is no longer available.",
@@ -166,8 +220,12 @@
       "skillsPlaceholder": "Type a skill and press Enter",
       "languages": "Languages",
       "languagesPlaceholder": "English, French…",
-      "cvUrl": "CV link (optional)",
-      "cvPlaceholder": "https://linkedin.com/in/…",
+      "cvUpload": "CV",
+      "cvUploadBtn": "Upload CV (PDF, DOC, DOCX)",
+      "cvUploading": "Uploading…",
+      "cvReplace": "Replace",
+      "cvView": "View",
+      "cvUploadError": "Upload failed. Check the file format.",
       "add": "Add"
     }
   },
@@ -183,6 +241,13 @@
     "failedDelete": "Failed to delete",
     "failedCreate": "Failed to create",
     "failedUpdate": "Failed to update",
-    "language": "Language"
+    "clearFilters": "Clear filters",
+    "columns": "Columns",
+    "filterPlaceholder": "Filter…",
+    "actions": "Actions",
+    "language": "Language",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {current} of {total}"
   }
 }
