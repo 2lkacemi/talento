@@ -41,7 +41,7 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
   });
 
   if (isLoading) return <AppShell><div className="animate-pulse h-64 card bg-gray-100" /></AppShell>;
-  if (!client) return <AppShell><p>Client not found</p></AppShell>;
+  if (!client) return <AppShell><p className="text-gray-500">{t("notFound")}</p></AppShell>;
 
   return (
     <AppShell>
@@ -99,8 +99,10 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
               <p className="text-sm text-gray-500">{offer.location}</p>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-500">{offer.applicationsCount}</span>
-              <span className={offer.status === "OPEN" ? "badge-open" : "badge-closed"}>{offer.status}</span>
+              <span className="text-sm text-gray-500">{to("applications", { n: offer.applicationsCount })}</span>
+              <span className={offer.status === "OPEN" ? "badge-open" : "badge-closed"}>
+                {offer.status === "OPEN" ? tc("open") : tc("closed")}
+              </span>
             </div>
           </Link>
         ))}
@@ -109,7 +111,7 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
       <Modal open={showOfferModal} onClose={() => setShowOfferModal(false)} title={to("newOffer")} size="lg">
         <JobOfferForm
           defaultClientId={params.id}
-          onSubmit={(data) => createOfferMutation.mutateAsync(data)}
+          onSubmit={async (data) => { await createOfferMutation.mutateAsync(data); }}
           loading={createOfferMutation.isPending}
         />
       </Modal>

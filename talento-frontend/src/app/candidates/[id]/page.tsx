@@ -35,7 +35,7 @@ export default function CandidateDetailPage({ params }: { params: { id: string }
   });
 
   if (isLoading) return <AppShell><div className="card h-64 animate-pulse bg-gray-100" /></AppShell>;
-  if (!candidate) return <AppShell><p>Candidate not found</p></AppShell>;
+  if (!candidate) return <AppShell><p className="text-gray-500">{t("notFound")}</p></AppShell>;
 
   return (
     <AppShell>
@@ -52,7 +52,10 @@ export default function CandidateDetailPage({ params }: { params: { id: string }
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{candidate.fullName}</h1>
-            <p className="text-gray-500">{candidate.location} · {tc("yearsExp", { n: candidate.experienceYears })}</p>
+            <p className="text-gray-500">
+              {candidate.location ? `${candidate.location} · ` : ""}
+              {tc("yearsExp", { n: candidate.experienceYears })}
+            </p>
           </div>
         </div>
 

@@ -63,7 +63,14 @@ export default function OfferDetailPage({ params }: { params: { id: string } }) 
   const toggleStatus = useMutation({
     mutationFn: () =>
       jobOffersApi.update(params.id, {
-        ...offer,
+        title: offer!.title,
+        description: offer!.description,
+        clientId: offer!.clientId,
+        requiredSkills: offer!.requiredSkills,
+        requiredLanguages: offer!.requiredLanguages,
+        requiredExperienceYears: offer!.requiredExperienceYears,
+        location: offer!.location,
+        openPositions: offer!.openPositions,
         status: offer!.status === "OPEN" ? "CLOSED" : "OPEN",
       }),
     onSuccess: () => {
@@ -99,7 +106,7 @@ export default function OfferDetailPage({ params }: { params: { id: string } }) 
     });
 
   if (isLoading) return <AppShell><div className="card h-64 animate-pulse bg-gray-100" /></AppShell>;
-  if (!offer) return <AppShell><p>Offer not found</p></AppShell>;
+  if (!offer) return <AppShell><p className="text-gray-500">{t("notFound")}</p></AppShell>;
 
   const hired = applications.filter((a) => a.status === "HIRED").length;
   const total = offer.openPositions > 0 ? offer.openPositions : 1;
@@ -125,7 +132,9 @@ export default function OfferDetailPage({ params }: { params: { id: string } }) 
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <span className={offer.status === "OPEN" ? "badge-open" : "badge-closed"}>{offer.status}</span>
+            <span className={offer.status === "OPEN" ? "badge-open" : "badge-closed"}>
+            {offer.status === "OPEN" ? tc("open") : tc("closed")}
+          </span>
             <button
               onClick={() => toggleStatus.mutate()}
               disabled={toggleStatus.isPending}

@@ -77,7 +77,7 @@ export default function Sidebar({ open, onClose }: Props) {
                 onClick={onClose}
                 className={clsx(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                  pathname.startsWith(href)
+                  pathname === href || pathname.startsWith(href + "/")
                     ? "bg-blue-50 text-blue-700"
                     : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                 )}

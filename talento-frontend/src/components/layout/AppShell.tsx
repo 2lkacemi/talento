@@ -9,13 +9,22 @@ import { Menu } from "lucide-react";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const [ready, setReady] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated()) {
       router.replace("/login");
+    } else {
+      setReady(true);
     }
   }, [router]);
+
+  if (!ready) return (
+    <div className="flex h-screen items-center justify-center bg-gray-50">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+    </div>
+  );
 
   return (
     <div className="flex h-screen overflow-hidden">

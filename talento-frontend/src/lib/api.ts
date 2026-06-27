@@ -116,6 +116,8 @@ export const applicationsApi = {
     api.post<Application>("/applications/public", { candidateId, jobOfferId }).then((r) => r.data),
   updateStatus: (id: string, status: ApplicationStatus, notes?: string) =>
     api.patch<Application>(`/applications/${id}/status`, { status, notes }).then((r) => r.data),
+  updateNotes: (id: string, notes: string) =>
+    api.patch<Application>(`/applications/${id}/notes`, { notes }).then((r) => r.data),
   delete: (id: string) => api.delete(`/applications/${id}`),
 };
 

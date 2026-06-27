@@ -108,6 +108,13 @@ public class ApplicationService {
     }
 
     @Transactional
+    public ApplicationResponse updateNotes(UUID id, String notes) {
+        Application application = getApplicationOrThrow(id);
+        application.setNotes(notes);
+        return ApplicationResponse.from(applicationRepository.save(application));
+    }
+
+    @Transactional
     public void delete(UUID id) {
         if (!applicationRepository.existsById(id)) {
             throw new ResourceNotFoundException("Application", "id", id);

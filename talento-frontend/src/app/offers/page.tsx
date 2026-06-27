@@ -129,7 +129,7 @@ export default function OffersPage() {
                     <p className="text-sm text-gray-500">{offer.clientCompanyName}</p>
                   </Link>
                   <span className={offer.status === "OPEN" ? "badge-open shrink-0" : "badge-closed shrink-0"}>
-                    {offer.status}
+                    {offer.status === "OPEN" ? tc("open") : tc("closed")}
                   </span>
                 </div>
                 <div className="mb-3 flex flex-wrap gap-3 text-xs text-gray-500">
@@ -141,7 +141,7 @@ export default function OffersPage() {
                   <span className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />{tc("yearsShort", { n: offer.requiredExperienceYears })}
                   </span>
-                  <span>{offer.applicationsCount}</span>
+                  <span>{t("applications", { n: offer.applicationsCount })}</span>
                 </div>
                 {offer.requiredSkills.length > 0 && (
                   <div className="mb-4 flex flex-wrap gap-1">
@@ -163,7 +163,17 @@ export default function OffersPage() {
                       onClick={() =>
                         updateMutation.mutate({
                           id: offer.id,
-                          data: { ...offer, status: offer.status === "OPEN" ? "CLOSED" : "OPEN" },
+                          data: {
+                title: offer.title,
+                description: offer.description,
+                clientId: offer.clientId,
+                requiredSkills: offer.requiredSkills,
+                requiredLanguages: offer.requiredLanguages,
+                requiredExperienceYears: offer.requiredExperienceYears,
+                location: offer.location,
+                openPositions: offer.openPositions,
+                status: offer.status === "OPEN" ? "CLOSED" : "OPEN",
+              },
                         })
                       }
                       title={offer.status === "OPEN" ? t("closeOffer") : t("reopenOffer")}
@@ -224,13 +234,13 @@ export default function OffersPage() {
       )}
 
       <Modal open={showModal} onClose={() => setShowModal(false)} title={t("newOffer")} size="lg">
-        <JobOfferForm onSubmit={(d) => createMutation.mutateAsync(d)} loading={createMutation.isPending} />
+        <JobOfferForm onSubmit={async (d) => { await createMutation.mutateAsync(d); }} loading={createMutation.isPending} />
       </Modal>
       <Modal open={!!editing} onClose={() => setEditing(null)} title={t("editOffer")} size="lg">
         {editing && (
           <JobOfferForm
             initial={editing}
-            onSubmit={(d) => updateMutation.mutateAsync({ id: editing.id, data: d })}
+            onSubmit={async (d) => { await updateMutation.mutateAsync({ id: editing.id, data: d }); }}
             loading={updateMutation.isPending}
           />
         )}

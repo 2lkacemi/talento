@@ -2,6 +2,7 @@ package com.talento.controller;
 
 import com.talento.dto.request.ApplicationRequest;
 import com.talento.dto.request.ApplicationStatusRequest;
+import java.util.Map;
 import com.talento.dto.response.ApplicationResponse;
 import com.talento.dto.response.ApplicationStatusHistoryResponse;
 import com.talento.service.ApplicationService;
@@ -55,6 +56,12 @@ public class ApplicationController {
     public ResponseEntity<ApplicationResponse> updateStatus(@PathVariable UUID id,
                                                              @Valid @RequestBody ApplicationStatusRequest request) {
         return ResponseEntity.ok(applicationService.updateStatus(id, request));
+    }
+
+    @PatchMapping("/{id}/notes")
+    public ResponseEntity<ApplicationResponse> updateNotes(@PathVariable UUID id,
+                                                            @RequestBody Map<String, String> body) {
+        return ResponseEntity.ok(applicationService.updateNotes(id, body.get("notes")));
     }
 
     @DeleteMapping("/{id}")
