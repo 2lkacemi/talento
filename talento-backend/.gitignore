@@ -1,0 +1,9 @@
+# Maven build output
+target/
+
+# Env / secrets
+.env
+application-local.properties
+
+# IDE
+*.class
