@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { jobOffersApi } from "@/lib/api";
-import api from "@/lib/api";
+import { jobOffersApi, publicApplyApi } from "@/lib/api";
 import { X, CheckCircle, MapPin, Clock, Briefcase } from "lucide-react";
 import SkillTag from "@/components/ui/SkillTag";
 import CvUpload from "@/components/ui/CvUpload";
@@ -46,8 +45,7 @@ export default function ApplyPage({ params }: { params: { jobOfferId: string } }
     e.preventDefault();
     setLoading(true);
     try {
-      const { data: candidate } = await api.post("/candidates/public", form);
-      await api.post("/applications/public", { candidateId: candidate.id, jobOfferId: params.jobOfferId });
+      await publicApplyApi.apply(params.jobOfferId, form);
       setSubmitted(true);
     } catch (err: any) {
       toast.error(err.response?.data?.message || t("failed"));

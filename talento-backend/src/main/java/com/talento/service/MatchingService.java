@@ -26,8 +26,9 @@ public class MatchingService {
 
     @Transactional(readOnly = true)
     public List<RankedCandidateResponse> rankCandidatesForOffer(JobOffer offer) {
-        List<Candidate> allCandidates = candidateRepository.findAll();
-        Set<UUID> appliedCandidateIds = applicationRepository.findByJobOfferId(offer.getId())
+        UUID agencyId = offer.getAgency().getId();
+        List<Candidate> allCandidates = candidateRepository.findAllByAgencyId(agencyId);
+        Set<UUID> appliedCandidateIds = applicationRepository.findByJobOfferIdAndAgencyId(offer.getId(), agencyId)
             .stream()
             .map(a -> a.getCandidate().getId())
             .collect(Collectors.toSet());

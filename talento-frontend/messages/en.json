@@ -4,11 +4,11 @@
     "clients": "Clients",
     "offers": "Job Offers",
     "candidates": "Candidates",
+    "team": "Team",
     "signOut": "Sign out"
   },
   "auth": {
     "signIn": "Sign in",
-    "register": "Register",
     "email": "Email",
     "password": "Password",
     "fullName": "Full name",
@@ -16,10 +16,52 @@
     "emailPlaceholder": "jane@agency.com",
     "tagline": "Recruitment CRM for agencies",
     "submitLogin": "Sign in",
-    "submitRegister": "Create account",
     "submitting": "Please wait…",
     "welcomeBack": "Welcome, {name}!",
-    "failed": "Authentication failed"
+    "failed": "Authentication failed",
+    "noAgencyYet": "Don't have an agency yet?",
+    "createAgency": "Create one"
+  },
+  "registerAgency": {
+    "title": "Create your agency",
+    "tagline": "Start managing your recruitment pipeline",
+    "agencyName": "Agency name",
+    "agencyNamePlaceholder": "Acme Recruiting",
+    "submit": "Create agency",
+    "success": "Welcome to {name}!",
+    "alreadyHaveAgency": "Already have an agency?"
+  },
+  "acceptInvite": {
+    "intro": "You're invited to join {agencyName} as {role}.",
+    "submit": "Accept & create account",
+    "success": "Welcome to {name}!",
+    "invalidTitle": "Invitation not found",
+    "invalidMessage": "This invitation link doesn't exist. Ask your admin to send a new one.",
+    "expiredTitle": "Invitation no longer valid",
+    "expiredMessage": "This invitation has expired, been revoked, or already been used. Ask your admin to send a new one."
+  },
+  "team": {
+    "title": "Team",
+    "subtitle": "Manage your agency's users and invitations",
+    "inviteButton": "Invite teammate",
+    "membersTitle": "Members",
+    "noMembers": "No members yet",
+    "pendingInvitations": "Pending invitations",
+    "noInvitations": "No pending invitations",
+    "colName": "Name",
+    "colEmail": "Email",
+    "colRole": "Role",
+    "colStatus": "Status",
+    "roleAdmin": "Admin",
+    "roleRecruiter": "Recruiter",
+    "active": "Active",
+    "inactive": "Inactive",
+    "you": "you",
+    "invited": "Invitation sent",
+    "revoked": "Invitation revoked",
+    "roleUpdated": "Role updated",
+    "statusUpdated": "Status updated",
+    "inviteCreatedShare": "Share this link with your teammate:"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -252,6 +294,7 @@
     "language": "Language",
     "previous": "Previous",
     "next": "Next",
-    "pageOf": "Page {current} of {total}"
+    "pageOf": "Page {current} of {total}",
+    "close": "Close"
   }
 }

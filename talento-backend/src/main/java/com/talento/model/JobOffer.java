@@ -23,6 +23,10 @@ public class JobOffer {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agency_id", nullable = false)
+    private Agency agency;
+
     @NotBlank
     @Column(nullable = false)
     private String title;

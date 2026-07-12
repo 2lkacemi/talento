@@ -7,6 +7,7 @@ import com.talento.exception.DuplicateResourceException;
 import com.talento.exception.ResourceNotFoundException;
 import com.talento.model.Client;
 import com.talento.repository.ClientRepository;
+import com.talento.security.AgencyContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,17 +22,21 @@ import java.util.stream.Collectors;
 public class ClientService {
 
     private final ClientRepository clientRepository;
+    private final AgencyContext agencyContext;
 
     @Transactional(readOnly = true)
     public List<ClientResponse> findAll() {
-        return clientRepository.findAll().stream()
+        return clientRepository.findAllByAgencyId(agencyContext.getCurrentAgencyId()).stream()
             .map(ClientResponse::from)
             .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public PageResponse<ClientResponse> findAll(Pageable pageable) {
-        return PageResponse.from(clientRepository.findAll(pageable), ClientResponse::from);
+        return PageResponse.from(
+            clientRepository.findAllByAgencyId(agencyContext.getCurrentAgencyId(), pageable),
+            ClientResponse::from
+        );
     }
 
     @Transactional(readOnly = true)
@@ -41,11 +46,13 @@ public class ClientService {
 
     @Transactional
     public ClientResponse create(ClientRequest request) {
-        if (clientRepository.existsByEmail(request.getEmail())) {
+        UUID agencyId = agencyContext.getCurrentAgencyId();
+        if (clientRepository.existsByEmailAndAgencyId(request.getEmail(), agencyId)) {
             throw new DuplicateResourceException("Client with email already exists: " + request.getEmail());
         }
 
         Client client = new Client();
+        client.setAgency(agencyContext.getCurrentUser().getAgency());
         client.setName(request.getName());
         client.setCompanyName(request.getCompanyName());
         client.setEmail(request.getEmail());
@@ -57,7 +64,8 @@ public class ClientService {
     public ClientResponse update(UUID id, ClientRequest request) {
         Client client = getClientOrThrow(id);
 
-        if (!client.getEmail().equals(request.getEmail()) && clientRepository.existsByEmail(request.getEmail())) {
+        if (!client.getEmail().equals(request.getEmail())
+            && clientRepository.existsByEmailAndAgencyId(request.getEmail(), agencyContext.getCurrentAgencyId())) {
             throw new DuplicateResourceException("Client with email already exists: " + request.getEmail());
         }
 
@@ -70,14 +78,15 @@ public class ClientService {
 
     @Transactional
     public void delete(UUID id) {
-        if (!clientRepository.existsById(id)) {
+        UUID agencyId = agencyContext.getCurrentAgencyId();
+        if (!clientRepository.existsByIdAndAgencyId(id, agencyId)) {
             throw new ResourceNotFoundException("Client", "id", id);
         }
         clientRepository.deleteById(id);
     }
 
     private Client getClientOrThrow(UUID id) {
-        return clientRepository.findById(id)
+        return clientRepository.findByIdAndAgencyId(id, agencyContext.getCurrentAgencyId())
             .orElseThrow(() -> new ResourceNotFoundException("Client", "id", id));
     }
 }

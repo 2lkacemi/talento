@@ -1,11 +1,14 @@
 import axios from "axios";
 import {
+  AgencyUser,
   Application,
   ApplicationStatus,
   AuthResponse,
   Candidate,
   Client,
   DashboardStats,
+  Invitation,
+  InvitationPreview,
   JobOffer,
   PageResponse,
   RankedCandidate,
@@ -31,10 +34,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (r) => r,
   (err) => {
-    if (err.response?.status === 401 && typeof window !== "undefined") {
+    const status = err.response?.status;
+    if ((status === 401 || status === 403) && typeof window !== "undefined") {
       localStorage.removeItem("talento_token");
       localStorage.removeItem("talento_user");
-      window.location.href = "/login";
+      if (window.location.pathname !== "/login") window.location.href = "/login";
     }
     return Promise.reject(err);
   }
@@ -44,8 +48,33 @@ api.interceptors.response.use(
 export const authApi = {
   login: (email: string, password: string) =>
     api.post<AuthResponse>("/auth/login", { email, password }).then((r) => r.data),
-  register: (fullName: string, email: string, password: string) =>
-    api.post<AuthResponse>("/auth/register", { fullName, email, password }).then((r) => r.data),
+  registerAgency: (agencyName: string, fullName: string, email: string, password: string) =>
+    api
+      .post<AuthResponse>("/auth/register-agency", { agencyName, fullName, email, password })
+      .then((r) => r.data),
+  previewInvitation: (token: string) =>
+    api.get<InvitationPreview>(`/auth/invitations/${token}`).then((r) => r.data),
+  acceptInvitation: (token: string, fullName: string, password: string) =>
+    api
+      .post<AuthResponse>(`/auth/invitations/${token}/accept`, { fullName, password })
+      .then((r) => r.data),
+};
+
+// Invitations (agency admin)
+export const invitationsApi = {
+  getAll: () => api.get<Invitation[]>("/invitations").then((r) => r.data),
+  create: (email: string, role: "ADMIN" | "RECRUITER") =>
+    api.post<Invitation>("/invitations", { email, role }).then((r) => r.data),
+  revoke: (id: string) => api.delete(`/invitations/${id}`),
+};
+
+// Agency users (agency admin)
+export const usersApi = {
+  getAll: () => api.get<AgencyUser[]>("/users").then((r) => r.data),
+  changeRole: (id: string, role: "ADMIN" | "RECRUITER") =>
+    api.patch<AgencyUser>(`/users/${id}/role`, { role }).then((r) => r.data),
+  setEnabled: (id: string, enabled: boolean) =>
+    api.patch<AgencyUser>(`/users/${id}/status`, { enabled }).then((r) => r.data),
 };
 
 // Dashboard
@@ -112,13 +141,17 @@ export const applicationsApi = {
     api.get<StatusHistoryEntry[]>(`/applications/${id}/history`).then((r) => r.data),
   create: (candidateId: string, jobOfferId: string, notes?: string) =>
     api.post<Application>("/applications", { candidateId, jobOfferId, notes }).then((r) => r.data),
-  createPublic: (candidateId: string, jobOfferId: string) =>
-    api.post<Application>("/applications/public", { candidateId, jobOfferId }).then((r) => r.data),
   updateStatus: (id: string, status: ApplicationStatus, notes?: string) =>
     api.patch<Application>(`/applications/${id}/status`, { status, notes }).then((r) => r.data),
   updateNotes: (id: string, notes: string) =>
     api.patch<Application>(`/applications/${id}/notes`, { notes }).then((r) => r.data),
   delete: (id: string) => api.delete(`/applications/${id}`),
+};
+
+// Public application (no auth)
+export const publicApplyApi = {
+  apply: <T extends object>(jobOfferId: string, data: T) =>
+    api.post<Application>(`/public/apply/${jobOfferId}`, data).then((r) => r.data),
 };
 
 // Global search

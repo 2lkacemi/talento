@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface ApplicationStatusHistoryRepository extends JpaRepository<ApplicationStatusHistory, UUID> {
-    List<ApplicationStatusHistory> findByApplicationIdOrderByChangedAtAsc(UUID applicationId);
+    List<ApplicationStatusHistory> findByApplicationIdAndAgencyIdOrderByChangedAtAsc(UUID applicationId, UUID agencyId);
 }

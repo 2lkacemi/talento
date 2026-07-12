@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { authApi } from "@/lib/api";
 import { saveAuth } from "@/lib/auth";
 import toast from "react-hot-toast";
@@ -11,18 +12,14 @@ import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 export default function LoginPage() {
   const router = useRouter();
   const t = useTranslations("auth");
-  const [mode, setMode] = useState<"login" | "register">("login");
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ fullName: "", email: "", password: "" });
+  const [form, setForm] = useState({ email: "", password: "" });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
-      const auth =
-        mode === "login"
-          ? await authApi.login(form.email, form.password)
-          : await authApi.register(form.fullName, form.email, form.password);
+      const auth = await authApi.login(form.email, form.password);
       saveAuth(auth);
       toast.success(t("welcomeBack", { name: auth.fullName }));
       router.push("/dashboard");
@@ -49,35 +46,7 @@ export default function LoginPage() {
         </div>
 
         <div className="card p-8">
-          <div className="mb-6 flex rounded-lg border border-gray-200 p-1">
-            <button
-              onClick={() => setMode("login")}
-              className={`flex-1 rounded-md py-1.5 text-sm font-medium transition-colors ${mode === "login" ? "bg-white shadow text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
-            >
-              {t("signIn")}
-            </button>
-            <button
-              onClick={() => setMode("register")}
-              className={`flex-1 rounded-md py-1.5 text-sm font-medium transition-colors ${mode === "register" ? "bg-white shadow text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
-            >
-              {t("register")}
-            </button>
-          </div>
-
           <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === "register" && (
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">{t("fullName")}</label>
-                <input
-                  type="text"
-                  required
-                  value={form.fullName}
-                  onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                  className="input"
-                  placeholder={t("fullNamePlaceholder")}
-                />
-              </div>
-            )}
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">{t("email")}</label>
               <input
@@ -102,9 +71,16 @@ export default function LoginPage() {
               />
             </div>
             <button type="submit" disabled={loading} className="btn-primary w-full justify-center">
-              {loading ? t("submitting") : mode === "login" ? t("submitLogin") : t("submitRegister")}
+              {loading ? t("submitting") : t("submitLogin")}
             </button>
           </form>
+
+          <p className="mt-6 text-center text-sm text-gray-600">
+            {t("noAgencyYet")}{" "}
+            <Link href="/register-agency" className="font-medium text-blue-600 hover:text-blue-700">
+              {t("createAgency")}
+            </Link>
+          </p>
         </div>
       </div>
     </div>

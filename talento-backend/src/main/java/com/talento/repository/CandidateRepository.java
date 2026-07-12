@@ -14,21 +14,29 @@ import java.util.UUID;
 
 @Repository
 public interface CandidateRepository extends JpaRepository<Candidate, UUID> {
-    Optional<Candidate> findByEmail(String email);
-    boolean existsByEmail(String email);
-    boolean existsByPhone(String phone);
+    Optional<Candidate> findByEmailAndAgencyId(String email, UUID agencyId);
+    boolean existsByEmailAndAgencyId(String email, UUID agencyId);
+    boolean existsByPhoneAndAgencyId(String phone, UUID agencyId);
 
-    @Query("SELECT c FROM Candidate c WHERE " +
+    Optional<Candidate> findByIdAndAgencyId(UUID id, UUID agencyId);
+    boolean existsByIdAndAgencyId(UUID id, UUID agencyId);
+
+    List<Candidate> findAllByAgencyId(UUID agencyId);
+    Page<Candidate> findAllByAgencyId(UUID agencyId, Pageable pageable);
+
+    long countByAgencyId(UUID agencyId);
+
+    @Query("SELECT c FROM Candidate c WHERE c.agency.id = :agencyId AND (" +
            "LOWER(c.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(c.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(c.email) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(c.location) LIKE LOWER(CONCAT('%', :query, '%'))")
-    List<Candidate> search(@Param("query") String query);
+           "LOWER(c.location) LIKE LOWER(CONCAT('%', :query, '%')))")
+    List<Candidate> search(@Param("query") String query, @Param("agencyId") UUID agencyId);
 
-    @Query("SELECT c FROM Candidate c WHERE " +
+    @Query("SELECT c FROM Candidate c WHERE c.agency.id = :agencyId AND (" +
            "LOWER(c.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(c.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(c.email) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(c.location) LIKE LOWER(CONCAT('%', :query, '%'))")
-    Page<Candidate> searchPage(@Param("query") String query, Pageable pageable);
+           "LOWER(c.location) LIKE LOWER(CONCAT('%', :query, '%')))")
+    Page<Candidate> searchPage(@Param("query") String query, @Param("agencyId") UUID agencyId, Pageable pageable);
 }

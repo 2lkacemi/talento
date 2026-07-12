@@ -47,11 +47,6 @@ public class ApplicationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(applicationService.create(request));
     }
 
-    @PostMapping("/public")
-    public ResponseEntity<ApplicationResponse> createPublic(@Valid @RequestBody ApplicationRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(applicationService.create(request));
-    }
-
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApplicationResponse> updateStatus(@PathVariable UUID id,
                                                              @Valid @RequestBody ApplicationStatusRequest request) {

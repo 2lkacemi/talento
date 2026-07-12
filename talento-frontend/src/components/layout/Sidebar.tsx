@@ -11,6 +11,7 @@ import {
   UserCircle,
   LogOut,
   Building2,
+  UsersRound,
   X,
 } from "lucide-react";
 import clsx from "clsx";
@@ -26,7 +27,7 @@ export default function Sidebar({ open, onClose }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const t = useTranslations("nav");
-  const [user, setUser] = useState<{ email: string; fullName: string; role: string } | null>(null);
+  const [user, setUser] = useState<ReturnType<typeof getUser>>(null);
 
   useEffect(() => {
     setUser(getUser());
@@ -37,6 +38,7 @@ export default function Sidebar({ open, onClose }: Props) {
     { href: "/clients",    label: t("clients"),    icon: Building2 },
     { href: "/offers",     label: t("offers"),     icon: Briefcase },
     { href: "/candidates", label: t("candidates"), icon: Users },
+    ...(user?.role === "ADMIN" ? [{ href: "/team", label: t("team"), icon: UsersRound }] : []),
   ];
 
   function handleLogout() {
@@ -100,6 +102,9 @@ export default function Sidebar({ open, onClose }: Props) {
           <div className="min-w-0">
             <p className="truncate text-sm font-medium text-gray-900">{user?.fullName}</p>
             <p className="truncate text-xs text-gray-500">{user?.role}</p>
+            {user?.agencyName && (
+              <p className="truncate text-xs text-gray-400">{user.agencyName}</p>
+            )}
           </div>
         </div>
         <button

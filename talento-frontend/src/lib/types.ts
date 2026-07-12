@@ -95,6 +95,36 @@ export interface AuthResponse {
   email: string;
   fullName: string;
   role: string;
+  agencyId: string;
+  agencyName: string;
+}
+
+export type InvitationStatus = "PENDING" | "ACCEPTED" | "REVOKED" | "EXPIRED";
+
+export interface Invitation {
+  id: string;
+  email: string;
+  role: string;
+  status: InvitationStatus;
+  createdAt: string;
+  expiresAt: string;
+  acceptedAt: string | null;
+  inviteUrl?: string;
+}
+
+export interface AgencyUser {
+  id: string;
+  email: string;
+  fullName: string;
+  role: string;
+  enabled: boolean;
+  createdAt: string;
+}
+
+export interface InvitationPreview {
+  email: string;
+  agencyName: string;
+  role: string;
 }
 
 export interface PageResponse<T> {

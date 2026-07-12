@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "clients")
+@Table(name = "clients", uniqueConstraints = @UniqueConstraint(columnNames = {"email", "agency_id"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,6 +25,10 @@ public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agency_id", nullable = false)
+    private Agency agency;
 
     @NotBlank
     @Column(nullable = false)
@@ -36,7 +40,7 @@ public class Client {
 
     @Email
     @NotBlank
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     private String phone;

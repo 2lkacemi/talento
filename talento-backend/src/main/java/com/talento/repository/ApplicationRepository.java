@@ -10,9 +10,10 @@ import java.util.UUID;
 
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, UUID> {
-    List<Application> findByJobOfferId(UUID jobOfferId);
-    List<Application> findByCandidateId(UUID candidateId);
-    Optional<Application> findByCandidateIdAndJobOfferId(UUID candidateId, UUID jobOfferId);
-    boolean existsByCandidateIdAndJobOfferId(UUID candidateId, UUID jobOfferId);
-    long countByStatus(Application.ApplicationStatus status);
+    List<Application> findByJobOfferIdAndAgencyId(UUID jobOfferId, UUID agencyId);
+    List<Application> findByCandidateIdAndAgencyId(UUID candidateId, UUID agencyId);
+    Optional<Application> findByIdAndAgencyId(UUID id, UUID agencyId);
+    boolean existsByCandidateIdAndJobOfferIdAndAgencyId(UUID candidateId, UUID jobOfferId, UUID agencyId);
+    long countByStatusAndAgencyId(Application.ApplicationStatus status, UUID agencyId);
+    long countByAgencyId(UUID agencyId);
 }

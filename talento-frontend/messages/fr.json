@@ -4,11 +4,11 @@
     "clients": "Clients",
     "offers": "Offres d'emploi",
     "candidates": "Candidats",
+    "team": "Équipe",
     "signOut": "Se déconnecter"
   },
   "auth": {
     "signIn": "Connexion",
-    "register": "Inscription",
     "email": "E-mail",
     "password": "Mot de passe",
     "fullName": "Nom complet",
@@ -16,10 +16,52 @@
     "emailPlaceholder": "jean@agence.fr",
     "tagline": "CRM de recrutement pour les agences",
     "submitLogin": "Se connecter",
-    "submitRegister": "Créer un compte",
     "submitting": "Veuillez patienter…",
     "welcomeBack": "Bienvenue, {name} !",
-    "failed": "Échec de l'authentification"
+    "failed": "Échec de l'authentification",
+    "noAgencyYet": "Vous n'avez pas encore d'agence ?",
+    "createAgency": "En créer une"
+  },
+  "registerAgency": {
+    "title": "Créez votre agence",
+    "tagline": "Commencez à gérer votre pipeline de recrutement",
+    "agencyName": "Nom de l'agence",
+    "agencyNamePlaceholder": "Talento Recrutement",
+    "submit": "Créer l'agence",
+    "success": "Bienvenue chez {name} !",
+    "alreadyHaveAgency": "Vous avez déjà une agence ?"
+  },
+  "acceptInvite": {
+    "intro": "Vous êtes invité(e) à rejoindre {agencyName} en tant que {role}.",
+    "submit": "Accepter et créer mon compte",
+    "success": "Bienvenue chez {name} !",
+    "invalidTitle": "Invitation introuvable",
+    "invalidMessage": "Ce lien d'invitation n'existe pas. Demandez à votre admin de vous en envoyer un nouveau.",
+    "expiredTitle": "Invitation invalide",
+    "expiredMessage": "Cette invitation a expiré, a été révoquée ou a déjà été utilisée. Demandez à votre admin de vous en envoyer une nouvelle."
+  },
+  "team": {
+    "title": "Équipe",
+    "subtitle": "Gérez les utilisateurs et invitations de votre agence",
+    "inviteButton": "Inviter un collègue",
+    "membersTitle": "Membres",
+    "noMembers": "Aucun membre pour le moment",
+    "pendingInvitations": "Invitations en attente",
+    "noInvitations": "Aucune invitation en attente",
+    "colName": "Nom",
+    "colEmail": "E-mail",
+    "colRole": "Rôle",
+    "colStatus": "Statut",
+    "roleAdmin": "Admin",
+    "roleRecruiter": "Recruteur",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "you": "vous",
+    "invited": "Invitation envoyée",
+    "revoked": "Invitation révoquée",
+    "roleUpdated": "Rôle mis à jour",
+    "statusUpdated": "Statut mis à jour",
+    "inviteCreatedShare": "Partagez ce lien avec votre collègue :"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -252,6 +294,7 @@
     "language": "Langue",
     "previous": "Précédent",
     "next": "Suivant",
-    "pageOf": "Page {current} sur {total}"
+    "pageOf": "Page {current} sur {total}",
+    "close": "Fermer"
   }
 }
