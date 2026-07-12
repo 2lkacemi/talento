@@ -61,7 +61,13 @@
     "revoked": "Invitation révoquée",
     "roleUpdated": "Rôle mis à jour",
     "statusUpdated": "Statut mis à jour",
-    "inviteCreatedShare": "Partagez ce lien avec votre collègue :"
+    "inviteCreatedShare": "Partagez ce lien avec votre collègue :",
+    "agencyNameLabel": "Nom de l'agence",
+    "agencyRenamed": "Agence renommée",
+    "resend": "Renvoyer l'invitation",
+    "resent": "Invitation renvoyée",
+    "resentAndCopied": "Nouveau lien d'invitation copié dans le presse-papiers",
+    "revoke": "Révoquer l'invitation"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -276,6 +282,7 @@
     }
   },
   "common": {
+    "save": "Enregistrer",
     "saving": "Enregistrement…",
     "loading": "Chargement",
     "open": "OUVERTE",

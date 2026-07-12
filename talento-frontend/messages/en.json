@@ -61,7 +61,13 @@
     "revoked": "Invitation revoked",
     "roleUpdated": "Role updated",
     "statusUpdated": "Status updated",
-    "inviteCreatedShare": "Share this link with your teammate:"
+    "inviteCreatedShare": "Share this link with your teammate:",
+    "agencyNameLabel": "Agency name",
+    "agencyRenamed": "Agency renamed",
+    "resend": "Resend invitation",
+    "resent": "Invitation resent",
+    "resentAndCopied": "New invite link copied to clipboard",
+    "revoke": "Revoke invitation"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -276,6 +282,7 @@
     }
   },
   "common": {
+    "save": "Save",
     "saving": "Saving…",
     "loading": "Loading",
     "open": "OPEN",

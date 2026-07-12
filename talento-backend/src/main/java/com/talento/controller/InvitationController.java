@@ -34,4 +34,9 @@ public class InvitationController {
         invitationService.revoke(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/resend")
+    public ResponseEntity<InvitationResponse> resend(@PathVariable UUID id) {
+        return ResponseEntity.ok(invitationService.resend(id));
+    }
 }

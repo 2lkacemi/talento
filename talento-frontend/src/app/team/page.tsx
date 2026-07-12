@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { invitationsApi, usersApi } from "@/lib/api";
+import { agencyApi, invitationsApi, usersApi } from "@/lib/api";
 import { getUser } from "@/lib/auth";
 import AppShell from "@/components/layout/AppShell";
 import PageHeader from "@/components/ui/PageHeader";
 import Modal from "@/components/ui/Modal";
 import EmptyState from "@/components/ui/EmptyState";
-import { Users, Plus, Trash2, Copy, Check } from "lucide-react";
+import { Users, Plus, Trash2, Copy, Check, Pencil, Send } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function TeamPage() {
@@ -26,6 +26,8 @@ export default function TeamPage() {
   });
   const [lastInviteUrl, setLastInviteUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [editingAgencyName, setEditingAgencyName] = useState(false);
+  const [agencyNameInput, setAgencyNameInput] = useState("");
 
   useEffect(() => {
     const user = getUser();
@@ -48,6 +50,36 @@ export default function TeamPage() {
     queryKey: ["team-invitations"],
     queryFn: invitationsApi.getAll,
     enabled: isAdmin === true,
+  });
+
+  const agencyQuery = useQuery({
+    queryKey: ["team-agency"],
+    queryFn: agencyApi.getMine,
+    enabled: isAdmin === true,
+  });
+
+  const renameAgencyMutation = useMutation({
+    mutationFn: (name: string) => agencyApi.rename(name),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["team-agency"] });
+      setEditingAgencyName(false);
+      toast.success(t("agencyRenamed"));
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || tc("failedUpdate")),
+  });
+
+  const resendMutation = useMutation({
+    mutationFn: invitationsApi.resend,
+    onSuccess: async (invitation) => {
+      qc.invalidateQueries({ queryKey: ["team-invitations"] });
+      if (invitation.inviteUrl) {
+        await navigator.clipboard.writeText(invitation.inviteUrl);
+        toast.success(t("resentAndCopied"));
+      } else {
+        toast.success(t("resent"));
+      }
+    },
+    onError: (e: any) => toast.error(e.response?.data?.message || tc("failedUpdate")),
   });
 
   const inviteMutation = useMutation({
@@ -127,6 +159,43 @@ export default function TeamPage() {
           </button>
         }
       />
+
+      <div className="mb-6 flex items-center gap-2">
+        <span className="text-sm text-gray-500">{t("agencyNameLabel")}:</span>
+        {editingAgencyName ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (agencyNameInput.trim()) renameAgencyMutation.mutate(agencyNameInput.trim());
+            }}
+            className="flex items-center gap-2"
+          >
+            <input
+              autoFocus
+              value={agencyNameInput}
+              onChange={(e) => setAgencyNameInput(e.target.value)}
+              className="rounded-md border border-gray-300 px-2 py-1 text-sm"
+            />
+            <button type="submit" disabled={renameAgencyMutation.isPending} className="btn-secondary py-1 text-xs">
+              {renameAgencyMutation.isPending ? tc("saving") : tc("save")}
+            </button>
+            <button type="button" onClick={() => setEditingAgencyName(false)} className="text-xs text-gray-500 hover:text-gray-700">
+              {tc("close")}
+            </button>
+          </form>
+        ) : (
+          <button
+            onClick={() => {
+              setAgencyNameInput(agencyQuery.data?.name ?? "");
+              setEditingAgencyName(true);
+            }}
+            className="flex items-center gap-1.5 text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors"
+          >
+            {agencyQuery.data?.name}
+            <Pencil className="h-3.5 w-3.5 text-gray-400" />
+          </button>
+        )}
+      </div>
 
       <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("membersTitle")}</h2>
       {users.length === 0 ? (
@@ -215,9 +284,19 @@ export default function TeamPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
+                    {(inv.status === "PENDING" || inv.status === "EXPIRED") && (
+                      <button
+                        onClick={() => resendMutation.mutate(inv.id)}
+                        title={t("resend")}
+                        className="rounded-lg p-1.5 text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      >
+                        <Send className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                     {inv.status === "PENDING" && (
                       <button
                         onClick={() => revokeMutation.mutate(inv.id)}
+                        title={t("revoke")}
                         className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors"
                       >
                         <Trash2 className="h-3.5 w-3.5" />

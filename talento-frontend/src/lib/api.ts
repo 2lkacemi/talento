@@ -66,6 +66,14 @@ export const invitationsApi = {
   create: (email: string, role: "ADMIN" | "RECRUITER") =>
     api.post<Invitation>("/invitations", { email, role }).then((r) => r.data),
   revoke: (id: string) => api.delete(`/invitations/${id}`),
+  resend: (id: string) => api.post<Invitation>(`/invitations/${id}/resend`).then((r) => r.data),
+};
+
+// Agency (agency admin)
+export const agencyApi = {
+  getMine: () => api.get<{ id: string; name: string; createdAt: string }>("/agency").then((r) => r.data),
+  rename: (name: string) =>
+    api.patch<{ id: string; name: string; createdAt: string }>("/agency", { name }).then((r) => r.data),
 };
 
 // Agency users (agency admin)

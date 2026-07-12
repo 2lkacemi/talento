@@ -3,6 +3,7 @@ package com.talento.service;
 import com.talento.dto.request.InviteUserRequest;
 import com.talento.dto.response.InvitationResponse;
 import com.talento.exception.DuplicateResourceException;
+import com.talento.exception.InvalidInvitationException;
 import com.talento.exception.ResourceNotFoundException;
 import com.talento.model.Invitation;
 import com.talento.repository.InvitationRepository;
@@ -79,6 +80,30 @@ public class InvitationService {
             .orElseThrow(() -> new ResourceNotFoundException("Invitation", "id", id));
         invitation.setStatus(Invitation.InvitationStatus.REVOKED);
         invitationRepository.save(invitation);
+    }
+
+    /**
+     * Resets the token and expiry on a still-pending (including expired-but-unaccepted)
+     * invitation, so an admin doesn't have to revoke and re-create it from scratch.
+     */
+    @Transactional
+    public InvitationResponse resend(UUID id) {
+        agencyContext.requireAdmin();
+        Invitation invitation = invitationRepository.findByIdAndAgencyId(id, agencyContext.getCurrentAgencyId())
+            .orElseThrow(() -> new ResourceNotFoundException("Invitation", "id", id));
+
+        if (invitation.getStatus() != Invitation.InvitationStatus.PENDING) {
+            throw new InvalidInvitationException("Only a pending invitation can be resent");
+        }
+
+        invitation.setToken(generateToken());
+        invitation.setExpiresAt(LocalDateTime.now().plusDays(EXPIRY_DAYS));
+        invitationRepository.save(invitation);
+
+        String inviteUrl = frontendUrl + "/accept-invite/" + invitation.getToken();
+        log.info("Invitation resent for {}: {}", invitation.getEmail(), inviteUrl);
+        // TODO: send this via email once spring-boot-starter-mail is wired up
+        return InvitationResponse.from(invitation, inviteUrl);
     }
 
     private String generateToken() {
