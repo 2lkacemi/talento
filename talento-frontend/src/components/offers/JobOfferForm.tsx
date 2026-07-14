@@ -33,6 +33,7 @@ export default function JobOfferForm({ initial, defaultClientId, onSubmit, loadi
     requiredLanguages: initial?.requiredLanguages ?? ([] as string[]),
     requiredExperienceYears: initial?.requiredExperienceYears ?? 0,
     location: initial?.location ?? "",
+    salary: initial?.salary ?? null as number | null,
     openPositions: initial?.openPositions ?? 1,
     status: initial?.status ?? ("OPEN" as JobOffer["status"]),
   });
@@ -120,17 +121,32 @@ export default function JobOfferForm({ initial, defaultClientId, onSubmit, loadi
         </div>
       </div>
 
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">{t("openPositions")}</label>
-        <input
-          type="number"
-          min={1}
-          value={form.openPositions}
-          onChange={(e) =>
-            setForm({ ...form, openPositions: Math.max(1, parseInt(e.target.value) || 1) })
-          }
-          className="input w-32"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">{t("openPositions")}</label>
+          <input
+            type="number"
+            min={1}
+            value={form.openPositions}
+            onChange={(e) =>
+              setForm({ ...form, openPositions: Math.max(1, parseInt(e.target.value) || 1) })
+            }
+            className="input w-32"
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">{t("salary")}</label>
+          <input
+            type="number"
+            min={0}
+            value={form.salary ?? ""}
+            onChange={(e) =>
+              setForm({ ...form, salary: e.target.value === "" ? null : parseFloat(e.target.value) })
+            }
+            className="input"
+            placeholder={t("salaryPlaceholder")}
+          />
+        </div>
       </div>
 
       <div>

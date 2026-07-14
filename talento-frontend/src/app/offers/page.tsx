@@ -11,7 +11,7 @@ import Modal from "@/components/ui/Modal";
 import JobOfferForm from "@/components/offers/JobOfferForm";
 import EmptyState from "@/components/ui/EmptyState";
 import SkillTag from "@/components/ui/SkillTag";
-import { Briefcase, Plus, Pencil, Trash2, ChevronRight, ChevronLeft, MapPin, Clock, Lock, LockOpen } from "lucide-react";
+import { Briefcase, Plus, Pencil, Trash2, ChevronRight, ChevronLeft, MapPin, Clock, Lock, LockOpen, Banknote } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -141,6 +141,11 @@ export default function OffersPage() {
                   <span className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />{tc("yearsShort", { n: offer.requiredExperienceYears })}
                   </span>
+                  {offer.salary != null && (
+                    <span className="flex items-center gap-1">
+                      <Banknote className="h-3 w-3" />{offer.salary.toLocaleString()}
+                    </span>
+                  )}
                   <span>{t("applications", { n: offer.applicationsCount })}</span>
                 </div>
                 {offer.requiredSkills.length > 0 && (
@@ -171,6 +176,7 @@ export default function OffersPage() {
                 requiredLanguages: offer.requiredLanguages,
                 requiredExperienceYears: offer.requiredExperienceYears,
                 location: offer.location,
+                salary: offer.salary,
                 openPositions: offer.openPositions,
                 status: offer.status === "OPEN" ? "CLOSED" : "OPEN",
               },

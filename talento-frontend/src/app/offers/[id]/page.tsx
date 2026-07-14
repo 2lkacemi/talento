@@ -8,7 +8,7 @@ import AppShell from "@/components/layout/AppShell";
 import KanbanBoard from "@/components/pipeline/KanbanBoard";
 import SkillTag from "@/components/ui/SkillTag";
 import {
-  ArrowDown, ArrowLeft, ArrowUp, ArrowUpDown,
+  ArrowDown, ArrowLeft, ArrowUp, ArrowUpDown, Banknote,
   CheckCircle, Clock, Lock, LockOpen, MapPin, Plus, Search, Star, Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -70,6 +70,7 @@ export default function OfferDetailPage({ params }: { params: { id: string } }) 
         requiredLanguages: offer!.requiredLanguages,
         requiredExperienceYears: offer!.requiredExperienceYears,
         location: offer!.location,
+        salary: offer!.salary,
         openPositions: offer!.openPositions,
         status: offer!.status === "OPEN" ? "CLOSED" : "OPEN",
       }),
@@ -155,6 +156,7 @@ export default function OfferDetailPage({ params }: { params: { id: string } }) 
         <div className="flex flex-wrap gap-6 text-sm text-gray-600">
           {offer.location && <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-gray-400" />{offer.location}</span>}
           <span className="flex items-center gap-1.5"><Clock className="h-4 w-4 text-gray-400" />{tc("yearsExp", { n: offer.requiredExperienceYears })}</span>
+          {offer.salary != null && <span className="flex items-center gap-1.5"><Banknote className="h-4 w-4 text-gray-400" />{offer.salary.toLocaleString()}</span>}
           <span className="flex items-center gap-1.5"><Users className="h-4 w-4 text-gray-400" />{applications.length}</span>
         </div>
 

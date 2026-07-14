@@ -168,6 +168,8 @@
       "statusOpen": "Ouverte",
       "statusClosed": "Fermée",
       "openPositions": "Nombre de postes à pourvoir",
+      "salary": "Salaire alloué",
+      "salaryPlaceholder": "ex. 45000",
       "save": "Enregistrer l'offre"
     },
     "hiringProgress": "Progression du recrutement",

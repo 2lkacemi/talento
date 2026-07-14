@@ -41,7 +41,7 @@ public class JobOfferController {
 
     @GetMapping("/{id}/public")
     public ResponseEntity<JobOfferResponse> getPublic(@PathVariable UUID id) {
-        return ResponseEntity.ok(JobOfferResponse.from(jobOfferService.findPublicById(id)));
+        return ResponseEntity.ok(JobOfferResponse.from(jobOfferService.findPublicById(id), false));
     }
 
     @GetMapping("/{id}/candidates-ranked")

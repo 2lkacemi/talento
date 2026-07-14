@@ -52,6 +52,8 @@ public class JobOffer {
 
     private String location;
 
+    private Double salary;
+
     @Column(nullable = false, columnDefinition = "integer default 1")
     private int openPositions = 1;
 

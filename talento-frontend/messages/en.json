@@ -168,6 +168,8 @@
       "statusOpen": "Open",
       "statusClosed": "Closed",
       "openPositions": "Number of open positions",
+      "salary": "Allocated salary",
+      "salaryPlaceholder": "e.g. 45000",
       "save": "Save offer"
     },
     "hiringProgress": "Hiring progress",

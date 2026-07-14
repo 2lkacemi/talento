@@ -27,6 +27,8 @@ public class JobOfferRequest {
 
     private String location;
 
+    private Double salary;
+
     private int openPositions = 1;
 
     private JobOffer.JobOfferStatus status = JobOffer.JobOfferStatus.OPEN;

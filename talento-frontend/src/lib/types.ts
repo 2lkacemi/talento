@@ -19,6 +19,7 @@ export interface JobOffer {
   requiredLanguages: string[];
   requiredExperienceYears: number;
   location: string;
+  salary?: number | null;
   openPositions: number;
   status: "OPEN" | "CLOSED";
   createdAt: string;

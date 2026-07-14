@@ -79,6 +79,7 @@ public class JobOfferService {
         offer.setRequiredLanguages(request.getRequiredLanguages() != null ? request.getRequiredLanguages() : List.of());
         offer.setRequiredExperienceYears(request.getRequiredExperienceYears());
         offer.setLocation(request.getLocation());
+        offer.setSalary(request.getSalary());
         offer.setOpenPositions(request.getOpenPositions() > 0 ? request.getOpenPositions() : 1);
         offer.setStatus(request.getStatus() != null ? request.getStatus() : JobOffer.JobOfferStatus.OPEN);
 
@@ -98,6 +99,7 @@ public class JobOfferService {
         offer.setRequiredLanguages(request.getRequiredLanguages() != null ? request.getRequiredLanguages() : List.of());
         offer.setRequiredExperienceYears(request.getRequiredExperienceYears());
         offer.setLocation(request.getLocation());
+        offer.setSalary(request.getSalary());
         offer.setOpenPositions(request.getOpenPositions() > 0 ? request.getOpenPositions() : 1);
         offer.setStatus(request.getStatus());
 
